@@ -7,14 +7,19 @@ import { User } from './schema/user.schema';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(@InjectModel("user") private userModel: Model<User>) {}
   async create(createUserDto: CreateUserDto) {
     const user = await this.userModel.create(createUserDto);
     return user;
   }
 
-  findAll() {
-    return this.userModel.find();
+  async findAll() {
+    return this.userModel
+      .find()
+      .populate('orders')
+      .populate('products') 
+      .populate('orders.products')
+      .exec();
   }
 
   async findOne(id: string) {
