@@ -41,4 +41,7 @@ export class AuthService {
     const user = await this.usersService.findOne(userId);
     return user;
   }
+  async getAllUsers() {
+    return this.usersService.findAll();
+  }
 }

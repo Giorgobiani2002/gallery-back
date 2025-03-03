@@ -17,11 +17,15 @@ export class AuthController {
     return this.authService.signIn(SignInDto);
   }
 
-  @UseGuards(authGuard)
+  // @UseGuards(authGuard)
   @Get('/current-user')
   getCurrentUser(@Req() request) {
     const userId = request.userId;
     console.log(userId);
     return this.authService.getCurrentUser(userId);
+  }
+  @Get('/users')
+  getAllUsers() {
+    return this.authService.getAllUsers();
   }
 }
