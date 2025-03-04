@@ -75,8 +75,8 @@ export class ProductsController {
     console.log('Main Image URL:', mainImgUrl);
     console.log('Mock Up Image URL:', mockUpImgUrl);
 
-    createProductDto.mainImg = mainImgUrl;
-    createProductDto.mockUpImg = mockUpImgUrl;
+    createProductDto.mainImgUrl = mainImgUrl;
+    createProductDto.mockUpImgUrl = mockUpImgUrl;
 
     const token = authorization.split(' ')[1];
     return this.productsService.create(token, createProductDto);

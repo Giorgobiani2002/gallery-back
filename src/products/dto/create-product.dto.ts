@@ -5,11 +5,11 @@ import { Type } from 'class-transformer';
 export class CreateProductDto {
   // @IsNotEmpty()
   // @IsString()
-  mainImg: string;
+  mainImgUrl: string;
 
   // @IsNotEmpty()
   // @IsString()
-  mockUpImg: string;
+  mockUpImgUrl: string;
 
   @IsNotEmpty()
   @IsString()
