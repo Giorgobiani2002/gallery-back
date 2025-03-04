@@ -1,15 +1,35 @@
-import { Controller, Get, Post, Delete, Patch, Body, Param, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Patch,
+  Body,
+  Param,
+  NotFoundException,
+  UseGuards,
+} from '@nestjs/common';
 import { CartService } from './cart.service';
-import mongoose from 'mongoose';
+import mongoose, { get } from 'mongoose';
+import { BuyerGuard, SellerGuard } from 'src/auth/guards/seller.guard';
+import { Role } from 'src/enums/roles.enum';
+import { authGuard } from 'src/auth/guards/auth.guard';
+
 
 @Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
+  // @Get('buyer')
+  // async getByer() {
+  //   return 'this is for buyer only';
+  // }
   @Get(':userId')
   async getCart(@Param('userId') userId: string) {
     try {
-      return this.cartService.getCartByUserId(new mongoose.Types.ObjectId(userId));
+      return this.cartService.getCartByUserId(
+        new mongoose.Types.ObjectId(userId),
+      );
     } catch (error) {
       throw new NotFoundException('Cart not found');
     }
@@ -25,7 +45,7 @@ export class CartController {
       return this.cartService.addToCart(
         new mongoose.Types.ObjectId(userId),
         new mongoose.Types.ObjectId(productId),
-        quantity
+        quantity,
       );
     } catch (error) {
       throw new NotFoundException('Product not found');
@@ -40,7 +60,7 @@ export class CartController {
     try {
       return this.cartService.removeFromCart(
         new mongoose.Types.ObjectId(userId),
-        new mongoose.Types.ObjectId(productId)
+        new mongoose.Types.ObjectId(productId),
       );
     } catch (error) {
       throw new NotFoundException('Cart or product not found');
@@ -57,7 +77,7 @@ export class CartController {
       return this.cartService.updateItemQuantity(
         new mongoose.Types.ObjectId(userId),
         new mongoose.Types.ObjectId(productId),
-        quantity
+        quantity,
       );
     } catch (error) {
       throw new NotFoundException('Cart or product not found');
