@@ -21,22 +21,22 @@ import { UpdateProductDto } from './dto/update-product.dto';
 export class ProductsController {
   constructor(
     private readonly productsService: ProductsService,
-    private readonly configService: ConfigService, 
+    private readonly configService: ConfigService,
   ) {}
 
-  @Post()
+  @Post('create')
   create(
-    @Headers('authorization') authorization: string, 
+    @Headers('authorization') authorization: string,
     @Body() createProductDto: CreateProductDto,
   ) {
     if (!authorization || !authorization.startsWith('Bearer ')) {
       throw new NotFoundException('Authorization header missing or invalid');
     }
 
-    const token = authorization.split(' ')[1]; 
+    const token = authorization.split(' ')[1];
     return this.productsService.create(token, createProductDto);
   }
-  
+
   @Get()
   findAll() {
     return this.productsService.findAll();
@@ -48,10 +48,7 @@ export class ProductsController {
   }
 
   @Patch(':id')
-  update(
-    @Param('id') id: string, 
-    @Body() updateProductDto: UpdateProductDto,
-  ) {
+  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productsService.update(id, updateProductDto);
   }
 

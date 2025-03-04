@@ -14,6 +14,7 @@ export class ProductsService {
     @InjectModel('user') private userModel: Model<User>,
     private jwtService: JwtService,
   ) {}
+
   async create(token: string, createProductDto: CreateProductDto) {
     const decoded = this.jwtService.decode(token) as { userId: string };
 
@@ -55,10 +56,8 @@ export class ProductsService {
       throw new NotFoundException('Product not found');
     }
 
-    // Update the product with the new data
     Object.assign(product, updateProductDto);
 
-    
     await product.save();
 
     return product;
@@ -66,20 +65,18 @@ export class ProductsService {
 
   async remove(id: string) {
     const product = await this.productModel.findById(id);
-  
+
     if (!product) {
       throw new NotFoundException('Product not found');
     }
-  
-    
+
     await this.productModel.findByIdAndDelete(id);
-  
-    
+
     await this.userModel.updateMany(
       { products: id },
       { $pull: { products: id } },
     );
-  
+
     return { message: 'Product removed successfully' };
   }
 }

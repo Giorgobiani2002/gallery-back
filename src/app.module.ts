@@ -10,6 +10,7 @@ import { OrderModule } from './order/order.module';
 import { CartModule } from './cart/cart.module';
 import { EmailService } from './email/email.service';
 import { EmailModule } from './email/email.module';
+import { AwsS3Module } from './upload/aws-s3.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { EmailModule } from './email/email.module';
     OrderModule,
     CartModule,
     EmailModule,
+    AwsS3Module,
   ],
   controllers: [AppController],
   providers: [AppService, EmailService],
