@@ -27,6 +27,8 @@ export class AppController {
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   uploadFile(@UploadedFile() file: Express.Multer.File) {
+    console.log(file, 'file appContr');
+
     const path = Math.random().toString().slice(2);
 
     const type = file.mimetype.split('/')[1];

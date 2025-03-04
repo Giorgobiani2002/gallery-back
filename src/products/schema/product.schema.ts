@@ -11,9 +11,15 @@ export enum Category {
 @Schema()
 export class Product extends Document {
   @Prop({ type: String, required: true })
+  mainImg: string;
+
+  @Prop({ type: String })
   mainImgUrl: string;
 
   @Prop({ type: String, required: true })
+  mockUpImg: string;
+
+  @Prop({ type: String })
   mockUpImgUrl: string;
 
   @Prop({ type: String, required: true })
@@ -33,8 +39,8 @@ export class Product extends Document {
 
   @Prop({ type: Number, default: 0 })
   total: number;
-  @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'user'})
-    user: mongoose.Schema.Types.ObjectId
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'user' })
+  user: mongoose.Schema.Types.ObjectId;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

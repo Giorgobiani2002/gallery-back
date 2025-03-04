@@ -3,20 +3,20 @@ import { Category } from '../schema/product.schema';
 import { Type } from 'class-transformer';
 
 export class CreateProductDto {
-  @IsNotEmpty()
-  @IsString()
-  mainImgUrl: string;
+  // @IsNotEmpty()
+  // @IsString()
+  mainImg: string;
 
-  @IsNotEmpty()
-  @IsString()
-  mockUpImgUrl: string;
+  // @IsNotEmpty()
+  // @IsString()
+  mockUpImg?: string;
 
   @IsNotEmpty()
   @IsString()
   title: string;
 
   @IsNotEmpty()
-  @IsNumber()
+  // @IsNumber()
   year: number;
 
   @IsNotEmpty()
@@ -28,11 +28,11 @@ export class CreateProductDto {
   category: Category;
 
   @IsNotEmpty()
-  @IsNumber()
+  // @IsNumber()
   price: number;
 
   @IsNotEmpty()
   @Type(() => Number)
-  @IsNumber()
+  // @IsNumber()
   total: number;
 }
