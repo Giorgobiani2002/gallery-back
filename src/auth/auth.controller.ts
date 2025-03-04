@@ -2,7 +2,8 @@ import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { signUpDto } from './dto/sign-up.dto';
 import { SignInDto } from './dto/sign-in-dto';
-import { authGuard } from './auth.guard';
+import { authGuard } from './guards/auth.guard';
+import { GoogleAuthGuard } from './guards/google-oauth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -12,6 +13,17 @@ export class AuthController {
   signUp(@Body() signUpDto: signUpDto) {
     return this.authService.signUp(signUpDto);
   }
+
+  @UseGuards(GoogleAuthGuard)
+  @Get('google')
+  async signInWithGoogle() {
+    return "hello"
+  }
+
+  @Get('google/callback')
+  @UseGuards(GoogleAuthGuard)
+  async googleAuthRedirect(@Req() req) {}
+
   @Post('sign-in')
   signIn(@Body() SignInDto: SignInDto) {
     return this.authService.signIn(SignInDto);
