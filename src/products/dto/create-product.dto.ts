@@ -9,7 +9,7 @@ export class CreateProductDto {
 
   // @IsNotEmpty()
   // @IsString()
-  mockUpImg?: string;
+  mockUpImg: string;
 
   @IsNotEmpty()
   @IsString()
