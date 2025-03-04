@@ -31,6 +31,7 @@ export class AuthService {
     if (!isPassEqual) throw new BadRequestException('Invalid Credentials');
     const payLoad = {
       userId: existUser._id,
+      userRole: existUser.role,
     };
 
     const accesToken = await this.jwtService.sign(payLoad, { expiresIn: '1h' });
