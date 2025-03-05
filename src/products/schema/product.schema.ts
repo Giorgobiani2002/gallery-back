@@ -33,8 +33,8 @@ export class Product extends Document {
 
   @Prop({ type: Number, default: 0 })
   total: number;
-  @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'user'})
-    user: mongoose.Schema.Types.ObjectId
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'user' })
+  user: mongoose.Schema.Types.ObjectId;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

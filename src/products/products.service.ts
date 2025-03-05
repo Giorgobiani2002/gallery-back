@@ -18,6 +18,7 @@ export class ProductsService {
     @InjectModel('user') private userModel: Model<User>,
     private jwtService: JwtService,
   ) {}
+
   async create(token: string, createProductDto: CreateProductDto) {
     const decoded = this.jwtService.decode(token) as { userId: string };
 
@@ -59,7 +60,6 @@ export class ProductsService {
       throw new NotFoundException('Product not found');
     }
 
-    
     Object.assign(product, updateProductDto);
 
     await product.save();
