@@ -49,6 +49,17 @@ export class ProductsService {
     return this.productModel.find();
   }
 
+  findSelected(take: number = 9, skip: number = 0) {
+    return this.productModel
+      .find()
+      .populate({
+        path: 'user',
+        select: '-products -createdAt -__v -password -role -cart',
+      })
+      .skip(skip)
+      .limit(take);
+  }
+
   findOne(id: number) {
     return `This action returns a #${id} product`;
   }
