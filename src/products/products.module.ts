@@ -4,7 +4,7 @@ import { ProductsController } from './products.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ProductSchema } from './schema/product.schema';
 import { UserSchema } from 'src/users/schema/user.schema';
-import { JwtModule } from '@nestjs/jwt';
+
 
 @Module({
   imports: [

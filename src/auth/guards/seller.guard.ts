@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { Observable, throwError } from 'rxjs';
+
 
 @Injectable()
 export class SellerGuard implements CanActivate {
