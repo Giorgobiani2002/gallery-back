@@ -54,7 +54,8 @@ export class ProductsService {
       .find()
       .populate({
         path: 'user',
-        select: '-products -createdAt -__v -password -role -cart',
+        select:
+          '-products -createdAt -__v -password -role -cart -orders -carts',
       })
       .skip(skip)
       .limit(take);

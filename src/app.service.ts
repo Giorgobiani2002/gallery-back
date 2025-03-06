@@ -32,8 +32,8 @@ export class AppService {
     return this.s3Service.getFileById(fileId);
   }
 
-  generateSignedUrl(filePath, expiration) {
-    return this.s3Service.generateSignedUrl(filePath, expiration);
+  generateSignedUrl(filePath) {
+    return this.s3Service.generateSignedUrl(filePath);
   }
 
   deleteFileById(fileId) {
