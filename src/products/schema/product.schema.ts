@@ -22,17 +22,27 @@ export class Product extends Document {
   @Prop({ type: Number, required: true })
   year: number;
 
-  @Prop({ type: String })
+  @Prop({ type: String, required: true })
   description: string;
 
   @Prop({ type: String, enum: Category, required: true })
   category: Category;
 
   @Prop({ type: Number, required: true })
+  width: number;
+
+  @Prop({ type: Number, required: true })
+  height: number;
+
+  @Prop({ type: Number })
+  ArtId: number;
+
+  @Prop({ type: Number, required: true })
   price: number;
 
   @Prop({ type: Number, default: 0 })
   total: number;
+
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'user' })
   user: mongoose.Schema.Types.ObjectId;
 }

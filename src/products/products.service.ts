@@ -32,8 +32,11 @@ export class ProductsService {
     const user = await this.userModel.findById(userId);
     if (!user) throw new NotFoundException('User not found');
 
+    const randomNum = Math.random().toString().slice(2, 6);
+
     const newProduct = new this.productModel({
       ...createProductDto,
+      ArtId: randomNum,
       user: user._id,
     });
 
@@ -77,8 +80,17 @@ export class ProductsService {
     ]);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  async findOne(id: string) {
+    const product = await this.productModel.findById(id).populate({
+      path: 'user',
+      select: '-products -createdAt -__v -password -role -cart -orders -carts',
+    });
+
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    return product;
   }
 
   async update(id: string, updateProductDto: UpdateProductDto) {
