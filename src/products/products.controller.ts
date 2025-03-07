@@ -26,6 +26,7 @@ import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { AwsS3Service } from 'src/upload/aws-s3.service';
 import { SellerGuard } from 'src/auth/guards/seller.guard';
 import { QueryPaginationParamsDto } from './dto/query-params.dto';
+import { QueryParamsLoadMoreDto } from './dto/query-params2-dto';
 
 @Controller('products')
 export class ProductsController {
@@ -77,11 +78,8 @@ export class ProductsController {
   }
 
   @Get('Select')
-  findSelected(
-    @Query('take') take: number = 9,
-    @Query('skip') skip: number = 0,
-  ) {
-    return this.productsService.findSelected(take, skip);
+  findSelected(@Query() queryParams: QueryParamsLoadMoreDto) {
+    return this.productsService.findSelected(queryParams);
   }
 
   @Get('slice')

@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsNumber } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 export class QueryPaginationParamsDto {
   @Transform(({ value }) => Number(value))

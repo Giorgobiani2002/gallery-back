@@ -34,6 +34,9 @@ export class Product extends Document {
   @Prop({ type: Number, required: true })
   height: number;
 
+  @Prop({ type: String })
+  artist: string;
+
   @Prop({ type: Number })
   ArtId: number;
 

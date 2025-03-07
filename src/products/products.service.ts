@@ -11,6 +11,7 @@ import { Product } from './schema/product.schema';
 import { User } from 'src/users/schema/user.schema';
 import { JwtService } from '@nestjs/jwt';
 import { QueryPaginationParamsDto } from './dto/query-params.dto';
+import { QueryParamsLoadMoreDto } from './dto/query-params2-dto';
 
 @Injectable()
 export class ProductsService {
@@ -37,6 +38,7 @@ export class ProductsService {
     const newProduct = new this.productModel({
       ...createProductDto,
       ArtId: randomNum,
+      artist: user.fullName,
       user: user._id,
     });
 
@@ -53,9 +55,31 @@ export class ProductsService {
     return this.productModel.find();
   }
 
-  findSelected(take: number = 9, skip: number = 0) {
+  findSelected({
+    take,
+    skip,
+    category,
+    year,
+    artist,
+    price,
+  }: QueryParamsLoadMoreDto) {
+    const query: any = {};
+
+    if (category) {
+      query.category = category;
+    }
+    if (year) {
+      query.year = year;
+    }
+    if (artist) {
+      query.artist = { $regex: artist, $options: 'i' };
+    }
+    if (price) {
+      query.price = { $lte: price };
+    }
+
     return this.productModel
-      .find()
+      .find(query)
       .populate({
         path: 'user',
         select:
