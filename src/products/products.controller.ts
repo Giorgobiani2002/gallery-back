@@ -25,6 +25,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { AwsS3Service } from 'src/upload/aws-s3.service';
 import { SellerGuard } from 'src/auth/guards/seller.guard';
+import { QueryPaginationParamsDto } from './dto/query-params.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -42,9 +43,6 @@ export class ProductsController {
     @Body() createProductDto: CreateProductDto,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
-    // console.log('Authorization:', authorization);
-    // console.log('Files uploaded:', files);
-
     if (!authorization || !authorization.startsWith('Bearer ')) {
       throw new NotFoundException('Authorization header missing or invalid');
     }
@@ -54,25 +52,17 @@ export class ProductsController {
     }
 
     const [mainImg, mockUpImg] = files;
-    // console.log('Main Image:', mainImg);
-    // console.log('Mock Up Image:', mockUpImg);
 
     const mainImgPath = Math.random().toString().slice(2);
     const FileMainImgPath = `images/${mainImgPath}`;
     const mockUpImgPath = Math.random().toString().slice(2);
     const FileMockUpImgPath = `images/${mockUpImgPath}`;
 
-    // console.log('Main Image Path:', mainImgPath);
-    // console.log('Mock Up Image Path:', mockUpImgPath);
-
     await this.s3Service.uploadFile(FileMainImgPath, mainImg);
     await this.s3Service.uploadFile(FileMockUpImgPath, mockUpImg);
 
     const mainImgUrl = await this.s3Service.generateSignedUrl(mainImgPath);
     const mockUpImgUrl = await this.s3Service.generateSignedUrl(mockUpImgPath);
-
-    // console.log('Main Image URL:', mainImgUrl);
-    // console.log('Mock Up Image URL:', mockUpImgUrl);
 
     createProductDto.mainImgUrl = mainImgUrl;
     createProductDto.mockUpImgUrl = mockUpImgUrl;
@@ -92,6 +82,17 @@ export class ProductsController {
     @Query('skip') skip: number = 0,
   ) {
     return this.productsService.findSelected(take, skip);
+  }
+
+  @Get('slice')
+  async findOnePage(@Query() queryParams: QueryPaginationParamsDto) {
+    const [data, totalCount] =
+      await this.productsService.findOnePage(queryParams);
+
+    return {
+      data,
+      totalCount,
+    };
   }
 
   @Get(':id')

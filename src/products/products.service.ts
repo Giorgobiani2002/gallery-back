@@ -10,6 +10,7 @@ import { Model } from 'mongoose';
 import { Product } from './schema/product.schema';
 import { User } from 'src/users/schema/user.schema';
 import { JwtService } from '@nestjs/jwt';
+import { QueryPaginationParamsDto } from './dto/query-params.dto';
 
 @Injectable()
 export class ProductsService {
@@ -59,6 +60,21 @@ export class ProductsService {
       })
       .skip(skip)
       .limit(take);
+  }
+
+  findOnePage({ page, take }: QueryPaginationParamsDto) {
+    return Promise.all([
+      this.productModel
+        .find()
+        .populate({
+          path: 'user',
+          select:
+            '-products -createdAt -__v -password -role -cart -orders -carts',
+        })
+        .skip((page - 1) * take)
+        .limit(take),
+      this.productModel.countDocuments(),
+    ]);
   }
 
   findOne(id: number) {
