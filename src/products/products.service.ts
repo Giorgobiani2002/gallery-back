@@ -55,31 +55,9 @@ export class ProductsService {
     return this.productModel.find();
   }
 
-  findSelected({
-    take,
-    skip,
-    category,
-    year,
-    artist,
-    price,
-  }: QueryParamsLoadMoreDto) {
-    const query: any = {};
-
-    if (category) {
-      query.category = category;
-    }
-    if (year) {
-      query.year = year;
-    }
-    if (artist) {
-      query.artist = { $regex: artist, $options: 'i' };
-    }
-    if (price) {
-      query.price = { $lte: price };
-    }
-
+  findSelected({ take, skip }: QueryParamsLoadMoreDto) {
     return this.productModel
-      .find(query)
+      .find()
       .populate({
         path: 'user',
         select:
