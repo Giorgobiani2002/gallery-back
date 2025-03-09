@@ -67,18 +67,42 @@ export class ProductsService {
       .limit(take);
   }
 
-  findOnePage({ page, take }: QueryPaginationParamsDto) {
+  findOnePage({
+    page,
+    take,
+    sortBy,
+    order,
+    category,
+  }: QueryPaginationParamsDto) {
+    const sortOptions = {};
+
+    console.log(
+      `Fetching data with parameters: page=${page}, take=${take}, sortBy=${sortBy}, order=${order}, category=${category}`,
+    );
+
+    if (sortBy === 'price') {
+      sortOptions['price'] = order === 'asc' ? 1 : -1;
+    } else if (sortBy === 'data') {
+      sortOptions['createdAt'] = order === 'asc' ? 1 : -1;
+    }
+
+    console.log('Sort Options:', sortOptions);
+
+    const categoryFilter = category ? { category } : {};
+
     return Promise.all([
       this.productModel
-        .find()
+        .find(categoryFilter)
         .populate({
           path: 'user',
           select:
             '-products -createdAt -__v -password -role -cart -orders -carts',
         })
         .skip((page - 1) * take)
-        .limit(take),
-      this.productModel.countDocuments(),
+        .limit(take)
+        .sort(sortOptions),
+
+      this.productModel.countDocuments(categoryFilter),
     ]);
   }
 

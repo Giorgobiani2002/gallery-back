@@ -9,4 +9,13 @@ export class QueryPaginationParamsDto {
   @Transform(({ value }) => Number(value))
   @IsNumber()
   page: number = 1;
+
+  @IsString()
+  sortBy: string;
+
+  @IsString()
+  order: string;
+
+  @IsString()
+  category: string;
 }
