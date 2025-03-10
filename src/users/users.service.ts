@@ -7,7 +7,7 @@ import { User } from './schema/user.schema';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel("user") private userModel: Model<User>) {}
+  constructor(@InjectModel('user') private userModel: Model<User>) {}
   async create(createUserDto: CreateUserDto) {
     const user = await this.userModel.create(createUserDto);
     return user;
@@ -17,15 +17,31 @@ export class UsersService {
     return this.userModel
       .find()
       .populate('orders')
-      .populate('products') 
+      .populate('products')
       .populate('orders.products')
       .exec();
   }
 
   async findOne(id: string) {
-    const user = await this.userModel.findById(id);
+    const user = await this.userModel.findById(id).populate({
+      path: 'products',
+      select: '-createdAt -__v',
+      populate: {
+        path: 'user',
+        select: 'fullName email role',
+      },
+    });
     return user;
   }
+
+  async getAllArtists() {
+    return this.userModel
+      .find({ role: 'seller' })
+      .select(
+        '-products -createdAt -__v -password -role -cart -orders -carts -email',
+      );
+  }
+
   async findOneByEmail(email: string) {
     const user = await this.userModel
       .findOne({ email: email })
