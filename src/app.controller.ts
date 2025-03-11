@@ -49,14 +49,10 @@ export class AppController {
   }
 
   @Get('generate-signed-url/:id')
-  async generateSignedUrl(
-    @Param('id') filePath: string,
-    @Query('expiration') expiration: number = 60 * 5,
-  ) {
+  async generateSignedUrl(@Param('id') filePath: string) {
     console.log(filePath, 'filePath');
-    console.log(expiration, 'expiration');
 
-    return this.appService.generateSignedUrl(filePath, expiration);
+    return this.appService.generateSignedUrl(filePath);
   }
 
   @Post('deleteFile')

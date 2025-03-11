@@ -29,6 +29,14 @@ export class CreateProductDto {
 
   @IsNotEmpty()
   // @IsNumber()
+  width: number;
+
+  @IsNotEmpty()
+  // @IsNumber()
+  height: number;
+
+  @IsNotEmpty()
+  // @IsNumber()
   price: number;
 
   // @IsNotEmpty()
