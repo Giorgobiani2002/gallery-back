@@ -1,14 +1,15 @@
+import { Transform } from 'class-transformer';
 import {
   IsEmail,
   IsNotEmpty,
-  IsNumber,
   IsString,
   Length,
+  isNumber,
   isString,
 } from 'class-validator';
 import { Role } from 'src/enums/roles.enum';
 
-export class CreateUserDto {
+export class signUpBuyerDto {
   @IsNotEmpty()
   @IsString()
   fullName: string;
@@ -21,12 +22,15 @@ export class CreateUserDto {
   @IsString()
   @Length(6, 20)
   password: string;
+
+  @IsNotEmpty()
+  @Length(9)
+  phoneNumber: number;
+
   @IsNotEmpty()
   @IsString()
-  role: Role;
+  @Length(6, 20)
+  passwordRepeat: string;
 
-  // @IsNotEmpty()
-  // @IsNumber()
-  // @Length(9)
-  // phoneNumber: number;
+  role: string = Role.BUYER;
 }

@@ -1,9 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { signUpDto } from './dto/sign-up.dto';
+import { signUpBuyerDto } from './dto/sign-upBuyer.dto';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { SignInDto } from './dto/sign-in-dto';
 import { JwtService } from '@nestjs/jwt';
+import { signUpSellerDto } from './dto/sign-upSeller.dto';
+import { Role } from 'src/enums/roles.enum';
 
 @Injectable()
 export class AuthService {
@@ -12,12 +14,28 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signUp(signUpDto: signUpDto) {
+  async signUpBuyer(signUpDto: signUpBuyerDto) {
     const existUser = await this.usersService.findOneByEmail(signUpDto.email);
     if (existUser) throw new BadRequestException('user already exist');
     const hashedPass = await bcrypt.hash(signUpDto.password, 10);
     console.log(hashedPass);
-    await this.usersService.create({ ...signUpDto, password: hashedPass });
+    await this.usersService.create({
+      ...signUpDto,
+      password: hashedPass,
+      role: Role.BUYER,
+    });
+    return 'user registered succesfully';
+  }
+  async signUpSeller(signUpDto: signUpSellerDto) {
+    const existUser = await this.usersService.findOneByEmail(signUpDto.email);
+    if (existUser) throw new BadRequestException('user already exist');
+    const hashedPass = await bcrypt.hash(signUpDto.password, 10);
+    console.log(hashedPass);
+    await this.usersService.create({
+      ...signUpDto,
+      password: hashedPass,
+      role: Role.SELLER,
+    });
     return 'user registered succesfully';
   }
 
@@ -31,6 +49,7 @@ export class AuthService {
     if (!isPassEqual) throw new BadRequestException('Invalid Credentials');
     const payLoad = {
       userId: existUser._id,
+      userName: existUser.fullName,
       userRole: existUser.role,
     };
 
