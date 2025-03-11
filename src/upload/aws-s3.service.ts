@@ -7,6 +7,7 @@ import {
 import { Injectable } from '@nestjs/common';
 import { Readable } from 'stream';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import * as sharp from 'sharp';
 
 @Injectable()
 export class AwsS3Service {
@@ -25,20 +26,39 @@ export class AwsS3Service {
   }
 
   async uploadFile(filePath: string, file) {
-    if (!filePath) return;
+    if (!filePath) {
+      console.error('Error: No file path provided.');
+      throw new Error('File path is required');
+    }
+
+    if (!file || !file.buffer) {
+      console.error('Error: Invalid file provided.');
+      throw new Error('Invalid file or missing buffer');
+    }
 
     try {
+      console.log('Compressing file...');
+      const compressedBuffer = await sharp(file.buffer)
+        .resize(800)
+        .jpeg({ quality: 80 })
+        .toBuffer();
+
+      console.log('File compressed successfully.');
+
       const config = {
         Key: filePath,
         Bucket: this.bucketName,
-        Body: file.buffer,
+        Body: compressedBuffer,
         ContentType: file.mimetype,
       };
+
       const uploadCommand = new PutObjectCommand(config);
       await this.storageService.send(uploadCommand);
+      console.log('File uploaded successfully');
+
       return filePath;
     } catch (error) {
-      console.error('Error uploading file:', error);
+      console.error('Error uploading file:', error.message);
       throw new Error('Failed to upload file');
     }
   }
@@ -90,26 +110,17 @@ export class AwsS3Service {
     }
   }
 
-  async generateSignedUrl(filePath: string, expiration: number = 60 * 5) {
+  async generateSignedUrl(filePath: string) {
     if (!filePath) throw new Error('File path is required');
 
-    console.log(filePath, 'images/');
     try {
-      const config = {
-        Bucket: this.bucketName,
-        Key: `images/${filePath}`,
-      };
+      const cloudfrontDomain = 'd1hun59bxazh5v.cloudfront.net';
+      const permanentUrl = `https://${cloudfrontDomain}/images/${filePath}`;
 
-      const command = new GetObjectCommand(config);
-
-      const signedUrl = await getSignedUrl(this.storageService, command, {
-        expiresIn: expiration,
-      });
-
-      return signedUrl;
+      return permanentUrl;
     } catch (error) {
-      console.error('Error generating signed URL:', error);
-      throw new Error('Failed to generate signed URL');
+      console.error('Error generating permanent URL:', error);
+      throw new Error('Failed to generate permanent URL');
     }
   }
 }
