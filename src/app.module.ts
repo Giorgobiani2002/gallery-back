@@ -11,6 +11,7 @@ import { CartModule } from './cart/cart.module';
 import { EmailService } from './email/email.service';
 import { EmailModule } from './email/email.module';
 import { AwsS3Module } from './upload/aws-s3.module';
+import { GalleriesModule } from './galleries/galleries.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AwsS3Module } from './upload/aws-s3.module';
     CartModule,
     EmailModule,
     AwsS3Module,
+    GalleriesModule,
   ],
   controllers: [AppController],
   providers: [AppService, EmailService],
