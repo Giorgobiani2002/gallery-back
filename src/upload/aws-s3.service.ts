@@ -7,7 +7,7 @@ import {
 import { Injectable } from '@nestjs/common';
 import { Readable } from 'stream';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import * as sharp from 'sharp';
+import sharp from 'sharp';
 
 @Injectable()
 export class AwsS3Service {
