@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { AwsS3Service } from './upload/aws-s3.service';
+import { AwsS3Service } from './upload/aws-s3.service.js';
 
 @Injectable()
 export class AppService {

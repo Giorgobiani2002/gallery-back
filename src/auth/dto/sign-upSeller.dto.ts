@@ -1,6 +1,13 @@
 import { Transform } from 'class-transformer';
-import { IsEmail, IsNotEmpty, IsString, Length, isNumber, isString } from 'class-validator';
-import { Role } from 'src/enums/roles.enum';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  Length,
+  isNumber,
+  isString,
+} from 'class-validator';
+import { Role } from 'src/enums/roles.enum.js';
 
 export class signUpSellerDto {
   @IsNotEmpty()
@@ -15,16 +22,16 @@ export class signUpSellerDto {
   @IsString()
   @Length(6, 20)
   password: string;
-   
+
   @IsNotEmpty()
   @Length(9)
-  phoneNumber:number;
+  phoneNumber: number;
 
   @IsNotEmpty()
   @IsString()
-  @Length(6,20)
-  passwordRepeat:string;
-  
+  @Length(6, 20)
+  passwordRepeat: string;
+
   // @IsNotEmpty()
   // @IsString()
   // photoUrl:string;

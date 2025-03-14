@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { ProductsService } from './products.service';
-import { ProductsController } from './products.controller';
+import { ProductsService } from './products.service.js';
+import { ProductsController } from './products.controller.js';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ProductSchema } from './schema/product.schema';
-import { UserSchema } from 'src/users/schema/user.schema';
+import { ProductSchema } from './schema/product.schema.js';
+import { UserSchema } from 'src/users/schema/user.schema.js';
 import { JwtModule } from '@nestjs/jwt';
-import { AwsS3Module } from 'src/upload/aws-s3.module';
+import { AwsS3Module } from 'src/upload/aws-s3.module.js';
 
 @Module({
   imports: [

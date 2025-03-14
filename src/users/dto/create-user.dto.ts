@@ -6,7 +6,7 @@ import {
   Length,
   isString,
 } from 'class-validator';
-import { Role } from 'src/enums/roles.enum';
+import { Role } from 'src/enums/roles.enum.js';
 
 export class CreateUserDto {
   @IsNotEmpty()

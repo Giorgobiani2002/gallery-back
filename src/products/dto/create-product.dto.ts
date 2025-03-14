@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { Category } from '../schema/product.schema';
+import { Category } from '../schema/product.schema.js';
 import { Type } from 'class-transformer';
 
 export class CreateProductDto {

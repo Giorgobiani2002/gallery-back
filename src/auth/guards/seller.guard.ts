@@ -9,7 +9,6 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 
-
 @Injectable()
 export class SellerGuard implements CanActivate {
   constructor(private readonly jwtService: JwtService) {}

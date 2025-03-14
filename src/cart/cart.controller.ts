@@ -9,12 +9,11 @@ import {
   NotFoundException,
   UseGuards,
 } from '@nestjs/common';
-import { CartService } from './cart.service';
+import { CartService } from './cart.service.js';
 import mongoose, { get } from 'mongoose';
-import { BuyerGuard, SellerGuard } from 'src/auth/guards/seller.guard';
-import { Role } from 'src/enums/roles.enum';
-import { authGuard } from 'src/auth/guards/auth.guard';
-
+import { BuyerGuard, SellerGuard } from 'src/auth/guards/seller.guard.js';
+import { Role } from 'src/enums/roles.enum.js';
+import { authGuard } from 'src/auth/guards/auth.guard.js';
 
 @Controller('cart')
 export class CartController {

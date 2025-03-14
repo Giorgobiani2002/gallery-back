@@ -8,12 +8,12 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { signUpBuyerDto } from './dto/sign-upBuyer.dto';
-import { SignInDto } from './dto/sign-in-dto';
-import { authGuard } from './guards/auth.guard';
-import { GoogleAuthGuard } from './guards/google-oauth.guard';
-import { signUpSellerDto } from './dto/sign-upSeller.dto';
+import { AuthService } from './auth.service.js';
+import { signUpBuyerDto } from './dto/sign-upBuyer.dto.js';
+import { SignInDto } from './dto/sign-in-dto.js';
+import { authGuard } from './guards/auth.guard.js';
+import { GoogleAuthGuard } from './guards/google-oauth.guard.js';
+import { signUpSellerDto } from './dto/sign-upSeller.dto.js';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('auth')

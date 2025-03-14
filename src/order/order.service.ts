@@ -5,11 +5,11 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Order } from './schema/order.schema';
-import { Product } from 'src/products/schema/product.schema';
-import { User } from 'src/users/schema/user.schema';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { EmailService } from 'src/email/email.service';
+import { Order } from './schema/order.schema.js';
+import { Product } from 'src/products/schema/product.schema.js';
+import { User } from 'src/users/schema/user.schema.js';
+import { CreateOrderDto } from './dto/create-order.dto.js';
+import { EmailService } from 'src/email/email.service.js';
 
 @Injectable()
 export class OrderService {
@@ -61,7 +61,6 @@ export class OrderService {
 
     const savedOrder = await newOrder.save();
 
-    
     await this.emailService.sendEmail(
       existingUser.email, // Send to user's email
       'Order Confirmation',

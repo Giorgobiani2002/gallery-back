@@ -7,7 +7,7 @@ import {
 import { Injectable } from '@nestjs/common';
 import { Readable } from 'stream';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import * as sharp from 'sharp';
+import sharp from 'sharp';
 
 @Injectable()
 export class AwsS3Service {
@@ -58,7 +58,7 @@ export class AwsS3Service {
 
       return filePath;
     } catch (error) {
-      console.error('Error uploading file:', error.message);
+      console.error('Error uploading file:', error);
       throw new Error('Failed to upload file');
     }
   }

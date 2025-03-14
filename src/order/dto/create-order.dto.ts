@@ -7,7 +7,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { OrderStatus } from '../schema/order.schema';
+import { OrderStatus } from '../schema/order.schema.js';
 
 class OrderProductDto {
   @IsMongoId()

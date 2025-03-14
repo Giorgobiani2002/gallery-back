@@ -7,17 +7,16 @@ import {
   NotFoundException,
   UseGuards,
 } from '@nestjs/common';
-import { Order } from './schema/order.schema';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { OrderService } from './order.service';
-import { BuyerGuard } from 'src/auth/guards/seller.guard';
-import { authGuard } from 'src/auth/guards/auth.guard';
+import { Order } from './schema/order.schema.js';
+import { CreateOrderDto } from './dto/create-order.dto.js';
+import { OrderService } from './order.service.js';
+import { BuyerGuard } from 'src/auth/guards/seller.guard.js';
+import { authGuard } from 'src/auth/guards/auth.guard.js';
 
 @UseGuards(authGuard)
 @Controller('orders')
 export class OrderController {
-  constructor(private readonly orderService: OrderService,) {}
-  
+  constructor(private readonly orderService: OrderService) {}
 
   @Post()
   async createOrder(@Body() createOrderDto: CreateOrderDto): Promise<Order> {

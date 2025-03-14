@@ -9,8 +9,8 @@ import {
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
-import { AppService } from './app.service';
-import { AwsS3Service } from './upload/aws-s3.service';
+import { AppService } from './app.service.js';
+import { AwsS3Service } from './upload/aws-s3.service.js';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller()

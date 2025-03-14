@@ -17,16 +17,16 @@ import {
   BadRequestException,
   Query,
 } from '@nestjs/common';
-import { ProductsService } from './products.service';
-import { CreateProductDto } from './dto/create-product.dto';
+import { ProductsService } from './products.service.js';
+import { CreateProductDto } from './dto/create-product.dto.js';
 import * as jwt from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto.js';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { AwsS3Service } from 'src/upload/aws-s3.service';
-import { SellerGuard } from 'src/auth/guards/seller.guard';
-import { QueryPaginationParamsDto } from './dto/query-params.dto';
-import { QueryParamsLoadMoreDto } from './dto/query-params2-dto';
+import { AwsS3Service } from 'src/upload/aws-s3.service.js';
+import { SellerGuard } from 'src/auth/guards/seller.guard.js';
+import { QueryPaginationParamsDto } from './dto/query-params.dto.js';
+import { QueryParamsLoadMoreDto } from './dto/query-params2-dto.js';
 
 @Controller('products')
 export class ProductsController {

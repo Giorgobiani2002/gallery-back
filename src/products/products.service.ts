@@ -3,15 +3,15 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { CreateProductDto } from './dto/create-product.dto.js';
+import { UpdateProductDto } from './dto/update-product.dto.js';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Product } from './schema/product.schema';
-import { User } from 'src/users/schema/user.schema';
+import { Product } from './schema/product.schema.js';
+import { User } from 'src/users/schema/user.schema.js';
 import { JwtService } from '@nestjs/jwt';
-import { QueryPaginationParamsDto } from './dto/query-params.dto';
-import { QueryParamsLoadMoreDto } from './dto/query-params2-dto';
+import { QueryPaginationParamsDto } from './dto/query-params.dto.js';
+import { QueryParamsLoadMoreDto } from './dto/query-params2-dto.js';
 
 @Injectable()
 export class ProductsService {
