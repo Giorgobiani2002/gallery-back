@@ -13,30 +13,10 @@ import { EmailModule } from './email/email.module';
 import { AwsS3Module } from './upload/aws-s3.module';
 import { Product } from './products/schema/product.schema'; // Import Product model
 
-// CommonJS - require() for commonjs packages
-const session = require('express-session');
-const formidable = require('express-formidable');
-
-// ESM - Dynamic import for ESM modules
 let AdminJSNestJS: any;
 let AdminJSExpress: any;
 let AdminJS: any;
-
-(async () => {
-  const adminJSModule = await import('adminjs');
-  AdminJS = adminJSModule.default || adminJSModule; // Handle both ESM and CommonJS
-
-  AdminJSExpress = await import('@adminjs/express');
-  AdminJSNestJS = await import('@adminjs/nestjs');
-
-  const AdminJSMongoose = await import('@adminjs/mongoose');
-
-  // Register AdminJS Mongoose Adapter
-  AdminJS.registerAdapter({
-    Resource: AdminJSMongoose.Resource,
-    Database: AdminJSMongoose.Database,
-  });
-})();
+let AdminJSMongoose: any;
 
 const DEFAULT_ADMIN = {
   email: 'admin@example.com',
@@ -55,30 +35,39 @@ const authenticate = async (email: string, password: string) => {
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRoot(process.env.MONGO_URI),
     import('@adminjs/nestjs').then(({ AdminModule }) =>
-      AdminModule.createAdminAsync({
-        useFactory: () => ({
-          adminJsOptions: {
-            rootPath: '/admin',
-            resources: [
-              {
-                resource: Product, // Add Product resource
-                options: {
-                  // You can customize the resource options here
-                },
+      import('@adminjs/mongoose').then((AdminJSMongoose) => {
+        return import('adminjs').then((AdminJS) => {
+          AdminJS.registerAdapter({
+            Resource: AdminJSMongoose.Resource,
+            Database: AdminJSMongoose.Database,
+          });
+
+          return AdminModule.createAdminAsync({
+            useFactory: () => ({
+              adminJsOptions: {
+                rootPath: '/admin',
+                resources: [
+                  {
+                    resource: Product, // Add Product resource
+                    options: {
+                      // You can customize the resource options here
+                    },
+                  },
+                ],
               },
-            ],
-          },
-          auth: {
-            authenticate,
-            cookieName: 'adminjs',
-            cookiePassword: 'secret',
-          },
-          sessionOptions: {
-            resave: true,
-            saveUninitialized: true,
-            secret: 'secret',
-          },
-        }),
+              auth: {
+                authenticate,
+                cookieName: 'adminjs',
+                cookiePassword: 'secret',
+              },
+              sessionOptions: {
+                resave: true,
+                saveUninitialized: true,
+                secret: 'secret',
+              },
+            }),
+          });
+        });
       }),
     ),
     UsersModule,
