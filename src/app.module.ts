@@ -11,6 +11,10 @@ import { CartModule } from './cart/cart.module';
 import { EmailService } from './email/email.service';
 import { EmailModule } from './email/email.module';
 import { AwsS3Module } from './upload/aws-s3.module';
+import { Product, ProductSchema } from './products/schema/product.schema';
+
+export const dynamicImport = async (packageName: string) =>
+  new Function(`return import('${packageName}')`)();
 
 const DEFAULT_ADMIN = {
   email: 'admin@example.com',
@@ -24,16 +28,19 @@ const authenticate = async (email: string, password: string) => {
   return null;
 };
 
+
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRoot(process.env.MONGO_URI),
     import('@adminjs/nestjs').then(({ AdminModule }) =>
+      import('adminjs').then()=>
       AdminModule.createAdminAsync({
         useFactory: () => ({
           adminJsOptions: {
             rootPath: '/admin',
-            resources: [],
+            resources: [ProductSchema],
           },
           auth: {
             authenticate,
