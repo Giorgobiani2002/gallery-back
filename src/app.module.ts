@@ -11,68 +11,41 @@ import { CartModule } from './cart/cart.module';
 import { EmailService } from './email/email.service';
 import { EmailModule } from './email/email.module';
 import { AwsS3Module } from './upload/aws-s3.module';
-import { Product } from './products/schema/product.schema'; // Import Product model
+import { Product, ProductSchema } from './products/schema/product.schema';
+import { initializeProvider } from './admin/options';
 
-let AdminJSNestJS: any;
-let AdminJSExpress: any;
-let AdminJS: any;
-let AdminJSMongoose: any;
-
-const DEFAULT_ADMIN = {
-  email: 'admin@example.com',
-  password: 'password',
-};
-
-const authenticate = async (email: string, password: string) => {
-  if (email === DEFAULT_ADMIN.email && password === DEFAULT_ADMIN.password) {
-    return Promise.resolve(DEFAULT_ADMIN);
-  }
-  return null;
-};
+export const dynamicImport = async (packageName: string) =>
+  new Function(`return import('${packageName}')`)();
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRoot(process.env.MONGO_URI),
-    import('@adminjs/nestjs').then(({ AdminModule }) =>
-      import('@adminjs/mongoose').then((AdminJSMongoose) => {
-        return import('adminjs').then((AdminJS) => {
-          AdminJS.registerAdapter({
-            Resource: AdminJSMongoose.Resource,
-            Database: AdminJSMongoose.Database,
-          });
+    MongooseModule.forFeature([{ name: Product.name, schema: ProductSchema }]),
 
-          return AdminModule.createAdminAsync({
-            useFactory: () => ({
-              adminJsOptions: {
-                rootPath: '/admin',
-                resources: [
-                  {
-                    resource: Product, // Add Product resource
-                    options: {
-                      // You can customize the resource options here
-                    },
-                  },
-                ],
-              },
-              auth: {
-                authenticate,
-                cookieName: 'adminjs',
-                cookiePassword: 'secret',
-              },
-              sessionOptions: {
-                resave: true,
-                saveUninitialized: true,
-                secret: 'secret',
-              },
-            }),
-          });
-        });
+    import('@adminjs/nestjs').then(({ AdminModule }) =>
+      AdminModule.createAdminAsync({
+        useFactory: async () => {
+          const { provider, options } = await initializeProvider();
+          return {
+            adminJsOptions: options,
+            auth: {
+              provider,
+              cookiePassword: process.env.COOKIE_SECRET,
+              cookieName: 'adminjs',
+            },
+            sessionOptions: {
+              resave: true,
+              saveUninitialized: true,
+              secret: process.env.COOKIE_SECRET,
+            },
+          };
+        },
       }),
     ),
     UsersModule,
     AuthModule,
-    ProductsModule, // ProductsModule already registers Product schema
+    ProductsModule,
     OrderModule,
     CartModule,
     EmailModule,
