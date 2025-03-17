@@ -2,6 +2,7 @@ import {
   IsEmail,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   Length,
   isString,
@@ -25,6 +26,13 @@ export class CreateUserDto {
   @IsString()
   role: Role;
 
+  @IsOptional()
+  @IsString()
+  profileUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  userBio?: string;
   // @IsNotEmpty()
   // @IsNumber()
   // @Length(9)

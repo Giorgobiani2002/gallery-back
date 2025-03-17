@@ -16,7 +16,7 @@ export class SellerGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();
-    const token = request.headers.authorization?.split(' ')[1]; // Extract JWT token
+    const token = request.headers.authorization?.split(' ')[1]; 
 
     if (!token) {
       throw new UnauthorizedException('No token provided');
