@@ -25,5 +25,10 @@ export class User {
   carts: mongoose.Schema.Types.ObjectId[];
   @Prop({ type: String, enum: Role, required: true })
   role: string;
+  @Prop({ type: String })
+  profileUrl: string;
+  @Prop({ type: String,})
+  userBio: string;
 }
+
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -21,6 +21,19 @@ export class UsersService {
       .populate('orders.products')
       .exec();
   }
+  async updateProfileImage(
+    userId: string,
+
+    profileImgUrl: string,
+    userBio: string,
+  ) {
+    const updatedUser = await this.userModel.findByIdAndUpdate(
+      userId,
+      { profileUrl: profileImgUrl, userBio }, 
+     
+    );
+    return updatedUser;
+  }
 
   async findOne(id: string) {
     const user = await this.userModel.findById(id).populate({
