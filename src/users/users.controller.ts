@@ -55,29 +55,30 @@ export class UsersController {
       );
     }
 
-   
     if (!file.mimetype.startsWith('image/')) {
       throw new NotFoundException(
         'Invalid file type. Please upload an image file',
       );
     }
 
-    const profileImgPath = `images/${Math.random().toString().slice(2)}`;
+    const imageName = Math.random().toString().slice(2);
+
+    const profileImgPath = `images/${imageName}`;
 
     await this.s3Service.uploadFile(profileImgPath, file);
 
-    const profileImgUrl =
-      await this.s3Service.generateSignedUrl(profileImgPath);
+    const profileImgUrl = await this.s3Service.generateSignedUrl(imageName);
 
     const token = authorization.split(' ')[1];
     let decodedToken: any;
     try {
-      decodedToken = jwt.verify(token, 'GELASUYVARSMAWONI');
+      decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     } catch (error) {
       throw new NotFoundException('Invalid or expired token');
     }
 
     const userId = decodedToken.userId;
+    console.log(userId);
     const { userBio } = body;
 
     const user = await this.usersService.updateProfileImage(
