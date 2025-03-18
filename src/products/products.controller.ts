@@ -98,6 +98,24 @@ export class ProductsController {
     return this.productsService.findOne(id);
   }
 
+  @Post('favorites/:id')
+  addFavorites(
+    @Param('id') id: string,
+    @Headers('authorization') authorization: string,
+  ) {
+    const token = authorization.split(' ')[1];
+    let decodedToken: any;
+    try {
+      decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (error) {
+      throw new NotFoundException('Invalid or expired token');
+    }
+
+    const userId = decodedToken.userId;
+
+    return this.productsService.addFavorites(id, userId);
+  }
+
   // @UseGuards(SellerGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {

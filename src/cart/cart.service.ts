@@ -16,7 +16,6 @@ export class CartService {
       .findOne({ user: userId })
       .populate('items.product');
 
-    
     if (!cart) {
       cart = new this.cartModel({ user: userId, items: [], totalPrice: 0 });
       await cart.save();
@@ -34,37 +33,32 @@ export class CartService {
     if (!product) {
       throw new NotFoundException('Product not found');
     }
-  
+
     let cart = await this.cartModel.findOne({ user: userId });
     if (!cart) {
-      
       cart = new this.cartModel({ user: userId, items: [], totalPrice: 0 });
     }
-  
+
     const existingItemIndex = cart.items.findIndex(
       (item) => item.product.toString() === productId.toString(),
     );
-  
+
     if (existingItemIndex >= 0) {
-      
       const existingItem = cart.items[existingItemIndex];
       existingItem.quantity += quantity;
       existingItem.price = product.price * existingItem.quantity;
     } else {
-      
       cart.items.push({
         product: productId,
         quantity,
         price: product.price * quantity,
       });
     }
-  
-    
+
     cart.totalPrice = cart.items.reduce((total, item) => total + item.price, 0);
-  
-    
+
     await cart.save();
-  
+
     return cart;
   }
 

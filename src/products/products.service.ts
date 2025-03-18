@@ -6,12 +6,14 @@ import {
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Product } from './schema/product.schema';
 import { User } from 'src/users/schema/user.schema';
 import { JwtService } from '@nestjs/jwt';
 import { QueryPaginationParamsDto } from './dto/query-params.dto';
 import { QueryParamsLoadMoreDto } from './dto/query-params2-dto';
+import { ObjectId } from 'mongodb';
+import { filter } from 'rxjs';
 
 @Injectable()
 export class ProductsService {
@@ -117,6 +119,40 @@ export class ProductsService {
     }
 
     return product;
+  }
+
+  async addFavorites(productId: string, userId: string) {
+    const user = await this.userModel.findById(userId);
+
+    const productObjectId = new Types.ObjectId(productId);
+
+    const existProduct = user.Favorites.some(
+      (fav) => fav.toString() === productObjectId.toString(),
+    );
+
+    if (existProduct) {
+      await this.userModel.updateOne(
+        { _id: userId },
+        { $pull: { Favorites: productId } },
+      );
+
+      await this.productModel.updateOne(
+        { _id: productId },
+        { $set: { isFavorite: false } },
+      );
+    } else {
+      await this.userModel.updateOne(
+        { _id: userId },
+        { $push: { Favorites: productId } },
+      );
+
+      await this.productModel.updateOne(
+        { _id: productId },
+        { $set: { isFavorite: true } },
+      );
+    }
+
+    return this.userModel.findById(userId);
   }
 
   async update(id: string, updateProductDto: UpdateProductDto) {
