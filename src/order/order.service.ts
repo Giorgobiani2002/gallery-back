@@ -14,9 +14,9 @@ import { EmailService } from 'src/email/email.service';
 @Injectable()
 export class OrderService {
   constructor(
-    @InjectModel('order') private readonly orderModel: Model<Order>,
-    @InjectModel('product') private readonly productModel: Model<Product>,
-    @InjectModel('user') private readonly userModel: Model<User>,
+    @InjectModel('Order') private readonly orderModel: Model<Order>,
+    @InjectModel('Product') private readonly productModel: Model<Product>,
+    @InjectModel('User') private readonly userModel: Model<User>,
     private readonly emailService: EmailService,
   ) {}
 
@@ -61,7 +61,6 @@ export class OrderService {
 
     const savedOrder = await newOrder.save();
 
-    
     await this.emailService.sendEmail(
       existingUser.email, // Send to user's email
       'Order Confirmation',

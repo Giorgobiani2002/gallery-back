@@ -9,9 +9,9 @@ import { CartSchema } from './schema/cart.schema';
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: 'product', schema: ProductSchema },
-      { name: 'user', schema: UserSchema },
-      { name: 'cart', schema: CartSchema },
+      { name: 'Product', schema: ProductSchema },
+      { name: 'User', schema: UserSchema },
+      { name: 'Cart', schema: CartSchema },
     ]),
   ],
   controllers: [CartController],

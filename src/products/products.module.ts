@@ -10,8 +10,8 @@ import { AwsS3Module } from 'src/upload/aws-s3.module';
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: 'product', schema: ProductSchema },
-      { name: 'user', schema: UserSchema },
+      { name: 'Product', schema: ProductSchema },
+      { name: 'User', schema: UserSchema },
     ]),
     AwsS3Module,
   ],

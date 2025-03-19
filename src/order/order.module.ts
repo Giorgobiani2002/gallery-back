@@ -10,9 +10,9 @@ import { EmailModule } from 'src/email/email.module';
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: 'product', schema: ProductSchema },
-      { name: 'user', schema: UserSchema },
-      { name: 'order', schema: OrderSchema },
+      { name: 'Product', schema: ProductSchema },
+      { name: 'User', schema: UserSchema },
+      { name: 'Order', schema: OrderSchema },
     ]),
     EmailModule,
   ],

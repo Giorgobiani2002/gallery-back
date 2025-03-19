@@ -16,9 +16,9 @@ import { QueryParamsLoadMoreDto } from './dto/query-params2-dto';
 @Injectable()
 export class ProductsService {
   constructor(
-    @InjectModel('product') private productModel: Model<Product>,
-    @InjectModel('user') private userModel: Model<User>,
-    private jwtService: JwtService,
+    @InjectModel('Product') private productModel: Model<Product>,
+    @InjectModel('User') private userModel: Model<User>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async create(token: string, createProductDto: CreateProductDto) {

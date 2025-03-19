@@ -49,3 +49,5 @@ export class Product extends Document {
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
+
+export const ProductModel = mongoose.model('Product', ProductSchema);
