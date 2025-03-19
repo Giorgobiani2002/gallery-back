@@ -78,14 +78,50 @@ export class ProductsController {
   }
 
   @Get('Select')
-  findSelected(@Query() queryParams: QueryParamsLoadMoreDto) {
-    return this.productsService.findSelected(queryParams);
+  findSelected(
+    @Query() queryParams: QueryParamsLoadMoreDto,
+    @Headers('authorization') authorization: string,
+  ) {
+    let userId = null;
+
+    if (authorization && authorization.startsWith('Bearer ')) {
+      const token = authorization.split(' ')[1];
+      let decodedToken: any;
+      try {
+        decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        userId = decodedToken.userId;
+      } catch (error) {
+        throw new NotFoundException('Invalid or expired token');
+      }
+    }
+
+    console.log(userId, 'userId userId');
+
+    return this.productsService.findSelected(queryParams, userId);
   }
 
   @Get('slice')
-  async findOnePage(@Query() queryParams: QueryPaginationParamsDto) {
-    const [data, totalCount] =
-      await this.productsService.findOnePage(queryParams);
+  async findOnePage(
+    @Query() queryParams: QueryPaginationParamsDto,
+    @Headers('authorization') authorization: string,
+  ) {
+    let userId = null;
+
+    if (authorization && authorization.startsWith('Bearer ')) {
+      const token = authorization.split(' ')[1];
+      let decodedToken: any;
+      try {
+        decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        userId = decodedToken.userId;
+      } catch (error) {
+        throw new NotFoundException('Invalid or expired token');
+      }
+    }
+
+    const [data, totalCount] = await this.productsService.findOnePage(
+      queryParams,
+      userId,
+    );
 
     return {
       data,
@@ -93,7 +129,7 @@ export class ProductsController {
     };
   }
 
-  @Get(':id')
+  @Get('findOne:id')
   findOne(@Param('id') id: string) {
     return this.productsService.findOne(id);
   }
@@ -103,17 +139,38 @@ export class ProductsController {
     @Param('id') id: string,
     @Headers('authorization') authorization: string,
   ) {
-    const token = authorization.split(' ')[1];
-    let decodedToken: any;
-    try {
-      decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-    } catch (error) {
-      throw new NotFoundException('Invalid or expired token');
+    let userId = null;
+
+    if (authorization && authorization.startsWith('Bearer ')) {
+      const token = authorization.split(' ')[1];
+      let decodedToken: any;
+      try {
+        decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        userId = decodedToken.userId;
+      } catch (error) {
+        throw new NotFoundException('Invalid or expired token');
+      }
     }
 
-    const userId = decodedToken.userId;
-
     return this.productsService.addFavorites(id, userId);
+  }
+
+  @Get('getFavorites')
+  GetFavorites(@Headers('authorization') authorization: string) {
+    let userId = null;
+
+    if (authorization && authorization.startsWith('Bearer ')) {
+      const token = authorization.split(' ')[1];
+      let decodedToken: any;
+      try {
+        decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        userId = decodedToken.userId;
+      } catch (error) {
+        throw new NotFoundException('Invalid or expired token');
+      }
+    }
+
+    return this.productsService.GetFavorites(userId);
   }
 
   // @UseGuards(SellerGuard)
