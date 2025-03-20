@@ -39,10 +39,15 @@ export class Product extends Document {
 
   @Prop({ type: Number, required: true })
   price: number;
+
   @Prop({ type: Number, required: true })
   width: number;
+
   @Prop({ type: Number, required: true })
   depth: number;
+
+  @Prop({ type: Boolean })
+  isFavorite: boolean;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'user' })
   user: mongoose.Schema.Types.ObjectId;
