@@ -132,7 +132,7 @@ export class ProductsController {
     };
   }
 
-  @Get('findOne:id')
+  @Get('findOne/:id')
   findOne(@Param('id') id: string) {
     return this.productsService.findOne(id);
   }
