@@ -4,10 +4,14 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './schema/user.schema';
+import { Product } from 'src/products/schema/product.schema';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel('user') private userModel: Model<User>) {}
+  constructor(
+    @InjectModel('user') private userModel: Model<User>,
+    @InjectModel('product') private productModel: Model<Product>,
+  ) {}
   async create(createUserDto: CreateUserDto) {
     const user = await this.userModel.create(createUserDto);
     return user;
@@ -27,11 +31,10 @@ export class UsersService {
     profileImgUrl: string,
     userBio: string,
   ) {
-    const updatedUser = await this.userModel.findByIdAndUpdate(
-      userId,
-      { profileUrl: profileImgUrl, userBio }, 
-     
-    );
+    const updatedUser = await this.userModel.findByIdAndUpdate(userId, {
+      profileUrl: profileImgUrl,
+      userBio,
+    });
     return updatedUser;
   }
 
@@ -45,6 +48,36 @@ export class UsersService {
       },
     });
     return user;
+  }
+
+  async findArtist(id: string, userId: string) {
+    const user = userId ? await this.userModel.findById(userId) : null;
+
+    const artist = await this.userModel.findById(id);
+    if (!artist) {
+      throw new Error('Artist not found');
+    }
+
+    const products = await this.productModel.find({ user: id }).populate({
+      path: 'user',
+      select: '_id',
+    });
+
+    if (user) {
+      const favoriteProductIds = user.Favorites.map((id) => id.toString());
+
+      products.forEach((product) => {
+        product.isFavorite = favoriteProductIds.includes(
+          product._id.toString(),
+        );
+      });
+    } else {
+      products.forEach((product) => {
+        product.isFavorite = false;
+      });
+    }
+
+    return products;
   }
 
   async getAllArtists() {
