@@ -89,6 +89,7 @@ export class ProductsService {
 
     return products;
   }
+
   async findOnePage(
     { page, take, sortBy, order, category }: QueryPaginationParamsDto,
     userId: string | null,

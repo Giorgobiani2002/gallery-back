@@ -60,7 +60,6 @@ export class UsersService {
 
     const products = await this.productModel.find({ user: id }).populate({
       path: 'user',
-      select: '_id',
     });
 
     if (user) {
