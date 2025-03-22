@@ -58,13 +58,18 @@ export class ProductsService {
   }
 
   async findSelected(
-    { take, skip }: QueryParamsLoadMoreDto,
+    { take, skip, category }: QueryParamsLoadMoreDto,
     userId: string | null,
   ) {
     const user = userId ? await this.userModel.findById(userId) : null;
 
+    const query: any = {};
+    if (category) {
+      query.category = category;
+    }
+
     const products = await this.productModel
-      .find()
+      .find(query)
       .populate({
         path: 'user',
         select:
