@@ -62,7 +62,9 @@ export class PaypalService {
 
     try {
       const order = await this.client.execute(request);
+      console.log("succesfully ordered")
       return order.result;
+      
     } catch (err) {
       console.error('Error creating PayPal order:', err);
       throw new Error('Error creating PayPal order');
@@ -75,7 +77,7 @@ export class PaypalService {
 
     try {
       const capture = await this.client.execute(request);
-      return capture.result;
+      return capture.result; 
     } catch (err) {
       console.error('Error capturing PayPal payment:', err);
       throw new Error('Error capturing PayPal payment');
