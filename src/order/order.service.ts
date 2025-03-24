@@ -61,7 +61,6 @@ export class OrderService {
 
     const savedOrder = await newOrder.save();
 
-    
     await this.emailService.sendEmail(
       existingUser.email, // Send to user's email
       'Order Confirmation',
