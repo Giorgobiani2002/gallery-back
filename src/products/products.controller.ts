@@ -84,11 +84,14 @@ export class ProductsController {
   ) {
     let userId = null;
 
+    console.log(authorization);
+
     if (authorization && authorization.startsWith('Bearer ')) {
       const token = authorization.split(' ')[1];
       let decodedToken: any;
       try {
         decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        console.log(decodedToken, 'decodedToken');
         userId = decodedToken.userId;
       } catch (error) {
         throw new NotFoundException('Invalid or expired token');
@@ -129,7 +132,7 @@ export class ProductsController {
     };
   }
 
-  @Get('findOne:id')
+  @Get('findOne/:id')
   findOne(@Param('id') id: string) {
     return this.productsService.findOne(id);
   }

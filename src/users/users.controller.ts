@@ -108,6 +108,30 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
+  @Get('artist/:id')
+  findArtist(
+    @Param('id') id: string,
+    @Headers('authorization') authorization: string,
+  ) {
+    let userId = null;
+
+    console.log(authorization);
+
+    if (authorization && authorization.startsWith('Bearer ')) {
+      const token = authorization.split(' ')[1];
+      let decodedToken: any;
+      try {
+        decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        console.log(decodedToken, 'decodedToken');
+        userId = decodedToken.userId;
+      } catch (error) {
+        throw new NotFoundException('Invalid or expired token');
+      }
+    }
+
+    return this.usersService.findArtist(id, userId);
+  }
+
   @UseGuards(authGuard)
   @Patch('')
   update(@Req() request, @Body() updateUserDto: UpdateUserDto) {

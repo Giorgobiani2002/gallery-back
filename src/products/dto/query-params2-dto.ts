@@ -10,7 +10,7 @@ export class QueryParamsLoadMoreDto {
   @IsNumber()
   skip: number = 0;
 
-  @IsString()
+  @Transform(({ value }) => String(value))
   @IsOptional()
   category: string;
 
