@@ -11,9 +11,8 @@ import { AwsS3Service } from 'src/upload/aws-s3.service';
   imports: [
     MongooseModule.forFeature([
       { name: 'product', schema: ProductSchema },
-      { name: 'user', schema: UserSchema },
+      { name: 'User', schema: UserSchema },
       { name: 'order', schema: OrderSchema },
-      
     ]),
   ],
   controllers: [UsersController],
