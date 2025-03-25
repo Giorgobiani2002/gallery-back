@@ -1,47 +1,49 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose from 'mongoose';
+import mongoose, { Document, Schema, Model, model } from 'mongoose';
 import { Role } from 'src/enums/roles.enum';
 
-@Schema()
-export class User {
-  @Prop({ type: String })
+export interface IUser extends Document {
   fullName: string;
-
-  @Prop({ type: String })
   email: string;
-
-  @Prop({ type: String, select: false })
   password: string;
-
-  @Prop({ type: Number })
   phoneNumber: number;
-
-  @Prop({ type: String, select: false })
   passwordRepeat: string;
-
-  // @Prop({ type: String })
-  // photoUrl: string;
-
-  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'product', default: [] })
   products: mongoose.Schema.Types.ObjectId[];
-
-  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'order', default: [] })
   orders: mongoose.Schema.Types.ObjectId[];
-
-  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'cart', default: [] })
   carts: mongoose.Schema.Types.ObjectId[];
-
-  @Prop({ type: String, enum: Role, required: true })
   role: string;
-
-  @Prop({ type: String })
   profileUrl: string;
-
-  @Prop({ type: String })
   userBio: string;
-
-  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'product', default: [] })
   Favorites: mongoose.Schema.Types.ObjectId[];
 }
 
-export const UserSchema = SchemaFactory.createForClass(User);
+export const UserSchema = new Schema<IUser>(
+  {
+    fullName: { type: String, required: true },
+    email: { type: String, required: true },
+    password: { type: String, required: true, select: false },
+    phoneNumber: { type: Number },
+    passwordRepeat: { type: String, select: false },
+    products: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: 'product',
+      default: [],
+    },
+    orders: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: 'order',
+      default: [],
+    },
+    carts: { type: [mongoose.Schema.Types.ObjectId], ref: 'cart', default: [] },
+    role: { type: String, enum: Role, required: true },
+    profileUrl: { type: String },
+    userBio: { type: String },
+    Favorites: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: 'product',
+      default: [],
+    },
+  },
+  { timestamps: true },
+);
+
+export const User = model<IUser>('user', UserSchema);

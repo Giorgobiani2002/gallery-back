@@ -1,5 +1,4 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { Document } from 'mongoose';
+import { Schema, model, Types, Document } from 'mongoose';
 
 export enum Category {
   PAINTING = 'painting',
@@ -8,49 +7,50 @@ export enum Category {
   MIXEDMEDIA = 'mixedmedia',
 }
 
-@Schema()
-export class Product extends Document {
-  @Prop({ type: String, required: true })
+export interface IProduct extends Document {
   mainImgUrl: string;
-
-  @Prop({ type: String, required: true })
   mockUpImgUrl: string;
-
-  @Prop({ type: String, required: true })
   title: string;
-
-  @Prop({ type: Number, required: true })
   year: number;
-
-  @Prop({ type: String, required: true })
   description: string;
-
-  @Prop({ type: String, enum: Category, required: true })
   category: Category;
-
-  @Prop({ type: Number, required: true })
   height: number;
-
-  @Prop({ type: String })
-  artist: string;
-
-  @Prop({ type: Number })
-  ArtId: number;
-
-  @Prop({ type: Number, required: true })
+  artist?: string;
+  ArtId?: number;
   price: number;
-
-  @Prop({ type: Number, required: true })
   width: number;
-
-  @Prop({ type: Number, required: true })
   depth: number;
-
-  @Prop({ type: Boolean })
-  isFavorite: boolean;
-
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'user' })
-  user: mongoose.Schema.Types.ObjectId;
+  isFavorite?: boolean;
+  user: Types.ObjectId; // Reference to the User model (ObjectId)
 }
 
-export const ProductSchema = SchemaFactory.createForClass(Product);
+export const ProductSchema = new Schema<IProduct>(
+  {
+    mainImgUrl: { type: String, required: true },
+    mockUpImgUrl: { type: String, required: true },
+    title: { type: String, required: true },
+    year: { type: Number, required: true },
+    description: { type: String, required: true },
+    category: {
+      type: String,
+      enum: Object.values(Category),
+      required: true,
+    },
+    height: { type: Number, required: true },
+    artist: { type: String },
+    ArtId: { type: Number },
+    price: { type: Number, required: true },
+    width: { type: Number, required: true },
+    depth: { type: Number, required: true },
+    isFavorite: { type: Boolean },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'user', // Reference to the 'User' model
+      required: true,
+    },
+  },
+  { timestamps: true },
+);
+
+// Export the Product model and ProductSchema
+export const Product = model<IProduct>('Product', ProductSchema);

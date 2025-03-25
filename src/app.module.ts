@@ -11,7 +11,7 @@ import { CartModule } from './cart/cart.module';
 import { EmailService } from './email/email.service';
 import { EmailModule } from './email/email.module';
 import { AwsS3Module } from './upload/aws-s3.module';
-import { ProductSchema } from './products/schema/product.schema';
+import { Product, ProductSchema } from './products/schema/product.schema';
 import { Category } from './products/schema/product.schema';
 
 export const dynamicImport = async (packageName: string) =>
@@ -33,19 +33,18 @@ async function registerAdminAdapter() {
   const AdminJS = await dynamicImport('adminjs');
   const AdminJSMongoose = await dynamicImport('@adminjs/mongoose');
 
-  // რეგისტრაცია ადაპტერის
   AdminJS.default.registerAdapter({
     Resource: AdminJSMongoose.Resource,
     Database: AdminJSMongoose.Database,
   });
 }
 
-// რეგისტრაციისთვის, სანამ მოდული დაიწყებს მუშაობას
 registerAdminAdapter();
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    MongooseModule.forFeature([{ name: Product.name, schema: ProductSchema }]),
     MongooseModule.forRootAsync({
       useFactory: async () => ({
         uri: process.env.MONGO_URI,
@@ -65,32 +64,8 @@ registerAdminAdapter();
             rootPath: '/admin',
             resources: [
               {
-                resource: ProductSchema, // Mongoose მოდელი
-                options: {
-                  listProperties: [
-                    'mainImgUrl',
-                    'mockUpImgUrl',
-                    'title',
-                    'year',
-                    'category',
-                    'price',
-                  ], // რა უნდა იყოს ნახმარი რესურსებში
-                  editProperties: [
-                    'mainImgUrl',
-                    'mockUpImgUrl',
-                    'title',
-                    'year',
-                    'description',
-                    'category',
-                    'price',
-                    'height',
-                    'width',
-                    'depth',
-                    'isFavorite',
-                    'artist',
-                  ],
-                  filterProperties: ['category', 'price'],
-                },
+                resource: Product, // Mongoose მოდელი
+                options: {},
               },
             ],
           },

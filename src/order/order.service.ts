@@ -5,22 +5,22 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Order } from './schema/order.schema';
-import { Product } from 'src/products/schema/product.schema';
-import { User } from 'src/users/schema/user.schema';
+import { IOrder, Order } from './schema/order.schema';
+import { IProduct, Product } from 'src/products/schema/product.schema';
+import { IUser, User } from 'src/users/schema/user.schema';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class OrderService {
   constructor(
-    @InjectModel('order') private readonly orderModel: Model<Order>,
-    @InjectModel('product') private readonly productModel: Model<Product>,
-    @InjectModel('user') private readonly userModel: Model<User>,
+    @InjectModel(Order.name) private readonly orderModel: Model<IOrder>,
+    @InjectModel(Product.name) private productModel: Model<IProduct>,
+    @InjectModel(User.name) private userModel: Model<IUser>,
     private readonly emailService: EmailService,
   ) {}
 
-  async createOrder(createOrderDto: CreateOrderDto): Promise<Order> {
+  async createOrder(createOrderDto: CreateOrderDto): Promise<IOrder> {
     const { user, products } = createOrderDto;
 
     // Validate user exists
@@ -71,7 +71,7 @@ export class OrderService {
     return savedOrder;
   }
 
-  async getAllOrders(): Promise<Order[]> {
+  async getAllOrders(): Promise<IOrder[]> {
     return await this.orderModel
       .find()
       .populate('user')
@@ -79,7 +79,7 @@ export class OrderService {
       .exec();
   }
 
-  async getOrderById(orderId: string): Promise<Order> {
+  async getOrderById(orderId: string): Promise<IOrder> {
     const order = await this.orderModel
       .findById(orderId)
       .populate('user')

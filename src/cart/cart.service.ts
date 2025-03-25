@@ -1,17 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
-import { Cart } from './schema/cart.schema';
-import { Product } from 'src/products/schema/product.schema';
+import { Cart, ICart } from './schema/cart.schema';
+import { IProduct, Product } from 'src/products/schema/product.schema';
 
 @Injectable()
 export class CartService {
   constructor(
-    @InjectModel('cart') private readonly cartModel: Model<Cart>,
-    @InjectModel('product') private readonly productModel: Model<Product>,
+    @InjectModel(Cart.name) private readonly cartModel: Model<ICart>,
+    @InjectModel(Product.name) private productModel: Model<IProduct>,
   ) {}
 
-  async getCartByUserId(userId: mongoose.Types.ObjectId): Promise<Cart> {
+  async getCartByUserId(userId: mongoose.Types.ObjectId): Promise<ICart> {
     let cart = await this.cartModel
       .findOne({ user: userId })
       .populate('items.product');
@@ -28,7 +28,7 @@ export class CartService {
     userId: mongoose.Types.ObjectId,
     productId: mongoose.Types.ObjectId,
     quantity: number,
-  ): Promise<Cart> {
+  ): Promise<ICart> {
     const product = await this.productModel.findById(productId);
     if (!product) {
       throw new NotFoundException('Product not found');
@@ -65,7 +65,7 @@ export class CartService {
   async removeFromCart(
     userId: mongoose.Types.ObjectId,
     productId: mongoose.Types.ObjectId,
-  ): Promise<Cart> {
+  ): Promise<ICart> {
     const cart = await this.cartModel.findOne({ user: userId });
     if (!cart) {
       throw new NotFoundException('Cart not found');
@@ -84,7 +84,7 @@ export class CartService {
     userId: mongoose.Types.ObjectId,
     productId: mongoose.Types.ObjectId,
     quantity: number,
-  ): Promise<Cart> {
+  ): Promise<ICart> {
     const cart = await this.cartModel.findOne({ user: userId });
     if (!cart) {
       throw new NotFoundException('Cart not found');
