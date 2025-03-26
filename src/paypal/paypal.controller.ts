@@ -1,4 +1,10 @@
-import { Controller, Post, Param, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Param,
+  NotFoundException,
+  Get,
+} from '@nestjs/common';
 import { PaypalService } from './paypal.service';
 import { CartService } from 'src/cart/cart.service';
 
@@ -19,17 +25,18 @@ export class PaypalController {
       throw new NotFoundException('Error creating PayPal order');
     }
   }
-
-  @Post('capture/:orderId')
+  @Get('get-token')
+  async getToken(): Promise<string> {
+    return this.paypalService.getOAuthToken();
+  }
+  @Post('capture-payment/:orderId')
   async capturePayment(@Param('orderId') orderId: string) {
     try {
       const captureResult = await this.paypalService.capturePayment(orderId);
-
-      await this.cartService.clearCart(captureResult.userId);
-
-      return captureResult;
-    } catch (err) {
-      throw new NotFoundException('Error capturing PayPal payment');
+      return { message: 'Payment captured successfully', captureResult };
+    } catch (error) {
+      return { message: 'Error capturing payment', error: error.message };
     }
   }
+  
 }
