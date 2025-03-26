@@ -83,7 +83,7 @@ registerAdminAdapter();
           },
           auth: {
             authenticate,
-            cookieName: '',
+            cookieName: 'adminjs',
             cookiePassword: process.env.COOKIE_SECRET,
           },
           sessionOptions: {
