@@ -18,7 +18,7 @@ import { filter } from 'rxjs';
 @Injectable()
 export class ProductsService {
   constructor(
-    @InjectModel('Product') private productModel: Model<IProduct>,
+    @InjectModel(Product.name) private productModel: Model<IProduct>,
     @InjectModel(User.name) private userModel: Model<IUser>,
     private jwtService: JwtService,
   ) {}

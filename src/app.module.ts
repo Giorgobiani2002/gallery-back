@@ -13,13 +13,14 @@ import { EmailModule } from './email/email.module';
 import { AwsS3Module } from './upload/aws-s3.module';
 import { Product, ProductSchema } from './products/schema/product.schema';
 import { Category } from './products/schema/product.schema';
+import { User, UserSchema } from './users/schema/user.schema';
 
 export const dynamicImport = async (packageName: string) =>
   new Function(`return import('${packageName}')`)();
 
 const DEFAULT_ADMIN = {
-  email: '',
-  password: '',
+  email: 'admin@example.com',
+  password: 'admin',
 };
 
 const authenticate = async (email: string, password: string) => {
@@ -44,10 +45,17 @@ registerAdminAdapter();
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    MongooseModule.forFeature([{ name: Product.name, schema: ProductSchema }]),
+    MongooseModule.forFeature([
+      { name: Product.name, schema: ProductSchema },
+      { name: User.name, schema: UserSchema },
+    ]),
+
     MongooseModule.forRootAsync({
       useFactory: async () => ({
         uri: process.env.MONGO_URI,
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        serverSelectionTimeoutMS: 30000,
       }),
     }),
     UsersModule,
@@ -64,7 +72,11 @@ registerAdminAdapter();
             rootPath: '/admin',
             resources: [
               {
-                resource: Product, // Mongoose მოდელი
+                resource: Product,
+                options: {},
+              },
+              {
+                resource: User,
                 options: {},
               },
             ],
@@ -72,12 +84,12 @@ registerAdminAdapter();
           auth: {
             authenticate,
             cookieName: '',
-            cookiePassword: '',
+            cookiePassword: process.env.COOKIE_SECRET,
           },
           sessionOptions: {
             resave: true,
             saveUninitialized: true,
-            secret: 'secret',
+            secret: process.env.SESSION_SECRET,
           },
         }),
       }),
