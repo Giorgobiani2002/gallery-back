@@ -1,6 +1,5 @@
 import mongoose, { Schema, Document, model } from 'mongoose';
 
-// Define the OrderStatus enum
 export enum OrderStatus {
   PENDING = 'pending',
   PROCESSING = 'processing',
@@ -20,30 +19,28 @@ export interface IOrder extends Document {
   status: OrderStatus;
 }
 
-// Define the Order schema
 export const OrderSchema = new Schema<IOrder>(
   {
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Reference to the User model
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     products: [
       {
         product: {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'Product',
           required: true,
-        }, // Reference to the Product model
-        quantity: { type: Number, required: true, min: 1 }, // Quantity must be a positive number
-        price: { type: Number, required: true }, // Price for each product
+        },
+        quantity: { type: Number, required: true, min: 1 },
+        price: { type: Number, required: true },
       },
     ],
-    totalPrice: { type: Number, default: 0 }, // Default value set to 0
+    totalPrice: { type: Number, default: 0 },
     status: {
       type: String,
-      enum: Object.values(OrderStatus), // OrderStatus enum
-      default: OrderStatus.PENDING, // Default status is pending
+      enum: Object.values(OrderStatus),
+      default: OrderStatus.PENDING,
     },
   },
-  { timestamps: true }, // Automatically adds `createdAt` and `updatedAt` timestamps
+  { timestamps: true },
 );
 
-// Create the Order model
 export const Order = model<IOrder>('Order', OrderSchema);
