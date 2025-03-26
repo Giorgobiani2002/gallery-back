@@ -49,6 +49,7 @@ registerAdminAdapter();
       { name: Product.name, schema: ProductSchema },
       { name: User.name, schema: UserSchema },
     ]),
+    MongooseModule.forRoot(process.env.MONGO_URI),
 
     // MongooseModule.forRootAsync({
     //   useFactory: async () => ({

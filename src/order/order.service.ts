@@ -7,16 +7,17 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { IOrder, Order } from './schema/order.schema';
 import { IProduct, Product } from 'src/products/schema/product.schema';
-import { User } from 'src/users/schema/user.schema';
+import { User, Iuse } from 'src/users/schema/user.schema';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { EmailService } from 'src/email/email.service';
+import { IUser } from 'src/users/schema/user.schema';
 
 @Injectable()
 export class OrderService {
   constructor(
     @InjectModel(Order.name) private readonly orderModel: Model<IOrder>,
     @InjectModel(Product.name) private productModel: Model<IProduct>,
-    @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel(User.name) private userModel: Model<IUser>,
     private readonly emailService: EmailService,
   ) {}
 

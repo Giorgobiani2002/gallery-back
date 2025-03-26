@@ -14,12 +14,13 @@ import { QueryPaginationParamsDto } from './dto/query-params.dto';
 import { QueryParamsLoadMoreDto } from './dto/query-params2-dto';
 import { ObjectId } from 'mongodb';
 import { filter } from 'rxjs';
+import { IUser } from 'src/users/schema/user.schema';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectModel(Product.name) private productModel: Model<IProduct>,
-    @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel(User.name) private userModel: Model<IUser>,
     private jwtService: JwtService,
   ) {}
 
