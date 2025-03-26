@@ -50,14 +50,14 @@ registerAdminAdapter();
       { name: User.name, schema: UserSchema },
     ]),
 
-    MongooseModule.forRootAsync({
-      useFactory: async () => ({
-        uri: process.env.MONGO_URI,
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        serverSelectionTimeoutMS: 30000,
-      }),
-    }),
+    // MongooseModule.forRootAsync({
+    //   useFactory: async () => ({
+    //     uri: process.env.MONGO_URI,
+    //     useNewUrlParser: true,
+    //     useUnifiedTopology: true,
+    //     serverSelectionTimeoutMS: 30000,
+    //   }),
+    // }),
     UsersModule,
     AuthModule,
     ProductsModule,

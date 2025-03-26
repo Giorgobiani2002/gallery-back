@@ -8,7 +8,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { IProduct, Product } from './schema/product.schema';
-import { IUser, User } from 'src/users/schema/user.schema';
+import { User } from 'src/users/schema/user.schema';
 import { JwtService } from '@nestjs/jwt';
 import { QueryPaginationParamsDto } from './dto/query-params.dto';
 import { QueryParamsLoadMoreDto } from './dto/query-params2-dto';
@@ -19,7 +19,7 @@ import { filter } from 'rxjs';
 export class ProductsService {
   constructor(
     @InjectModel(Product.name) private productModel: Model<IProduct>,
-    @InjectModel(User.name) private userModel: Model<IUser>,
+    @InjectModel(User.name) private userModel: Model<User>,
     private jwtService: JwtService,
   ) {}
 
