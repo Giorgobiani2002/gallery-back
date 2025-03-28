@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 export interface Gallery extends mongoose.Document {
-  mainImgUrl: string;
+  //   mainImgUrl: string;
   name: string;
   addres: string;
   info: string;
@@ -12,10 +12,10 @@ export interface Gallery extends mongoose.Document {
 }
 
 export const GallerySchema = new Schema({
-  mainImgUrl: {
-    type: String,
-    required: true,
-  },
+  //   mainImgUrl: {
+  //     type: String,
+  //     required: true,
+  //   },
   name: {
     type: String,
     required: true,

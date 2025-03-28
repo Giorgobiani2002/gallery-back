@@ -1,9 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
+import { Product } from 'src/products/schema/product.schema';
 
 @Schema()
 export class Gallery extends Document {
-  @Prop({ type: String, required: true })
+  @Prop({ type: String })
   mainImgUrl: string;
 
   @Prop({ type: String, required: true })
@@ -18,8 +19,8 @@ export class Gallery extends Document {
   @Prop({ type: String, required: true })
   details: string;
 
-  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'product', default: [] })
-  products: mongoose.Schema.Types.ObjectId[];
+  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'Product', default: [] })
+  products: Product[];
 }
 
 export const GallerySchema = SchemaFactory.createForClass(Gallery);
