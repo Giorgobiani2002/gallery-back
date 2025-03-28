@@ -17,6 +17,8 @@ import { User } from './mongoose/user-model';
 import { Product } from './mongoose/product-model';
 import { Order } from './mongoose/order-model';
 import { Cart } from './mongoose/cart-model';
+import { GalleriesModule } from './galleries/galleries.module';
+import { Gallery } from './mongoose/gallery-model';
 
 import('adminjs').then(({ AdminJS }) => {
   import('@adminjs/mongoose').then((AdminJSMongoose) => {
@@ -51,12 +53,14 @@ const authenticate = async (email: string, password: string) => {
           getModelToken('Product'),
           getModelToken('Order'),
           getModelToken('Cart'),
+          getModelToken('Gallery'),
         ],
         useFactory: (
           userModel: Model<User>,
           ProductModel: Model<Product>,
           OrderModel: Model<Order>,
           CartModel: Model<Cart>,
+          GalleryModel: Model<Gallery>,
         ) => ({
           adminJsOptions: {
             rootPath: '/admin',
@@ -65,6 +69,7 @@ const authenticate = async (email: string, password: string) => {
               { resource: ProductModel },
               { resource: OrderModel },
               { resource: CartModel },
+              { resource: GalleryModel },
             ],
           },
           auth: {
@@ -87,6 +92,7 @@ const authenticate = async (email: string, password: string) => {
     CartModule,
     EmailModule,
     AwsS3Module,
+    GalleriesModule,
   ],
   controllers: [AppController],
   providers: [AppService, EmailService],
