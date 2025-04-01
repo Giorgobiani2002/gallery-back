@@ -6,22 +6,30 @@ import {
   Body,
   NotFoundException,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { Order } from './schema/order.schema';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { OrderService } from './order.service';
-import { BuyerGuard } from 'src/auth/guards/seller.guard';
 import { authGuard } from 'src/auth/guards/auth.guard';
 
-@UseGuards(authGuard)
+// @UseGuards(authGuard)
 @Controller('orders')
 export class OrderController {
-  constructor(private readonly orderService: OrderService,) {}
-  
+  constructor(private readonly orderService: OrderService) {}
 
-  @Post()
-  async createOrder(@Body() createOrderDto: CreateOrderDto): Promise<Order> {
-    return await this.orderService.createOrder(createOrderDto);
+  @Post('create')
+  async createOrder(
+    @Body() createOrderDto: CreateOrderDto,
+    @Request() req,
+  ): Promise<Order> {
+    const token = req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+      throw new NotFoundException('Token is required');
+    }
+
+    return await this.orderService.createOrderFromPaypal(createOrderDto, token);
   }
 
   @Get()

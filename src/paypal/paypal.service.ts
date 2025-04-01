@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 import { HttpService } from '@nestjs/axios';
 import * as qs from 'qs';
 import { firstValueFrom } from 'rxjs';
+import { OrderService } from 'src/order/order.service';
 
 @Injectable()
 export class PaypalService {
@@ -19,6 +20,7 @@ export class PaypalService {
     private configService: ConfigService,
     private cartService: CartService,
     private readonly httpService: HttpService,
+    private readonly orderService: OrderService,
   ) {
     const clientId =
       'Aa8H4ZRChcL8MUIEpJSxnxV4-a-yo4p9N3uv2VK5yIppum_3FRrRN5waq_0o6oyE7uplMLoMNOXBGWMS';
@@ -35,14 +37,12 @@ export class PaypalService {
     this.client = new paypal.core.PayPalHttpClient(this.environment);
   }
 
-  
   async getOAuthToken(): Promise<string> {
     const clientId =
       'Aa8H4ZRChcL8MUIEpJSxnxV4-a-yo4p9N3uv2VK5yIppum_3FRrRN5waq_0o6oyE7uplMLoMNOXBGWMS';
     const secret =
       'EN8qBeEToM16BKi78nOvhmNKHPKaPfLIFb-xxWA303bdzx8Snt1OKSNImRcMafvxT9_gUZm1OZoi8TIp';
 
-    
     const auth = Buffer.from(`${clientId}:${secret}`).toString('base64');
 
     const body = qs.stringify({
@@ -69,18 +69,18 @@ export class PaypalService {
     }
   }
 
-  
   async createOrder(userId: string) {
     const cart = await this.cartService.getCartByUserId(
       new mongoose.Types.ObjectId(userId),
     );
+
     if (!cart) {
       throw new NotFoundException('Cart not found');
     }
 
     const total = cart.totalPrice;
     const currency = 'USD';
-    const returnUrl = 'http://localhost:3000/paypal-success';
+    const returnUrl = `http://localhost:3000/paypal-success`;
     const cancelUrl = 'http://localhost:3000/paypal-cancel';
 
     const request = new paypal.orders.OrdersCreateRequest();
@@ -110,40 +110,94 @@ export class PaypalService {
     }
   }
 
-  
-  async capturePayment(orderId: string): Promise<any> {
+  async capturePayment(orderId: string, payerId: string): Promise<any> {
     const request = new paypal.orders.OrdersCaptureRequest(orderId);
-    request.requestBody({});
+    request.requestBody({
+      payer_id: payerId,
+    });
 
     try {
-      
       const captureResponse = await this.client.execute(request);
       console.log('Payment captured successfully:', captureResponse);
-      return captureResponse.result; 
+      return captureResponse.result;
     } catch (error) {
       console.error('Error capturing payment:', error);
       throw new Error('Error capturing payment');
     }
   }
-
-  
-  async handlePaymentSuccess(orderId: string) {
+  async handlePaymentSuccess(orderId: string, payerId: string, token: string) {
     try {
-      const paymentResult = await this.capturePayment(orderId);
+      const paymentResult = await this.capturePayment(orderId, payerId);
 
-      if (paymentResult.status === 'COMPLETED') {
-        
+      console.log('Payment result:', paymentResult);
+
+      if (
+        paymentResult &&
+        paymentResult.purchase_units &&
+        paymentResult.purchase_units[0] &&
+        paymentResult.purchase_units[0].payments &&
+        paymentResult.purchase_units[0].payments.captures &&
+        paymentResult.purchase_units[0].payments.captures[0] &&
+        paymentResult.purchase_units[0].payments.captures[0].amount
+      ) {
+        const totalPrice =
+          paymentResult.purchase_units[0].payments.captures[0].amount.value;
+        const status = paymentResult.status;
+        const paypalOrderId = paymentResult.id;
+        console.log(paypalOrderId, 'es aris paypal order ID');
+
+        console.log('Total Price:', totalPrice);
+        console.log('Status:', status);
+
+        await this.orderService.createOrderFromPaypal(
+          {
+            paypalOrderId: paypalOrderId,
+            totalPrice: totalPrice,
+            status: status,
+          },
+          token,
+        );
+        if (!totalPrice || !status) {
+          throw new Error('Missing totalPrice or status from PayPal response');
+        }
+
         return {
           success: true,
           message: 'Payment captured successfully',
-          orderId: orderId, 
+          orderId: orderId,
+          paypalOrderId: paypalOrderId,
+          status: status,
+          totalPrice: totalPrice,
         };
       } else {
-        throw new Error('Payment capture failed');
+        console.error('Payment details are incomplete:', paymentResult);
+        throw new Error('Payment details are incomplete or malformed');
       }
     } catch (error) {
       console.error('Error in capturing payment:', error);
+
       throw new Error('Error capturing PayPal payment');
     }
   }
+
+  // Handle the success after payment capture
+  // async handlePaymentSuccess(orderId: string, payerId: string) {
+  //   try {
+  //     const paymentResult = await this.capturePayment(orderId, payerId);
+
+  //     if (paymentResult.status === 'COMPLETED') {
+  //       return {
+  //         success: true,
+  //         message: 'Payment captured successfully',
+  //         orderId: orderId,
+
+  //       };
+  //     } else {
+  //       throw new Error('Payment capture failed');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error in capturing payment:', error);
+  //     throw new Error('Error capturing PayPal payment');
+  //   }
+  // }
 }

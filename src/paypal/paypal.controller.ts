@@ -4,6 +4,8 @@ import {
   Param,
   NotFoundException,
   Get,
+  Headers,
+  BadRequestException,
 } from '@nestjs/common';
 import { PaypalService } from './paypal.service';
 import { CartService } from 'src/cart/cart.service';
@@ -29,14 +31,35 @@ export class PaypalController {
   async getToken(): Promise<string> {
     return this.paypalService.getOAuthToken();
   }
-  @Post('capture-payment/:orderId')
-  async capturePayment(@Param('orderId') orderId: string) {
+
+  @Post('capture-payment/:orderId/:payerID')
+  async capturePayment(
+    @Param('orderId') orderId: string,
+    @Param('payerID') payerId: string,
+    @Headers('Authorization') authorization: string,  // Extract the Authorization header
+  ) {
+    console.log('Received params:', { orderId, payerId });
+
+    
+    if (!authorization || !authorization.startsWith('Bearer ')) {
+      throw new BadRequestException('Authorization token is required and should be in "Bearer <token>" format');
+    }
+
+    // Extract token by removing "Bearer " from the Authorization header
+    const token = authorization.replace('Bearer ', '').trim();
+
     try {
-      const captureResult = await this.paypalService.capturePayment(orderId);
-      return { message: 'Payment captured successfully', captureResult };
+      const paymentResult = await this.paypalService.handlePaymentSuccess(
+        orderId,
+        payerId,
+        token, // Pass the extracted token
+      );
+      console.log(paymentResult);
+
+      return paymentResult;
     } catch (error) {
-      return { message: 'Error capturing payment', error: error.message };
+      console.error('Error capturing payment:', error);
+      throw new Error('Error capturing payment');
     }
   }
-  
 }

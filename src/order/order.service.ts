@@ -1,94 +1,106 @@
 import {
   Injectable,
   NotFoundException,
-  BadRequestException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { Order } from './schema/order.schema';
-import { Product } from 'src/products/schema/product.schema';
 import { User } from 'src/users/schema/user.schema';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { EmailService } from 'src/email/email.service';
+import { JwtService } from '@nestjs/jwt'; // Import the JwtService for token decoding
+import { ObjectId } from 'mongoose'; // Import ObjectId for casting
 
 @Injectable()
 export class OrderService {
   constructor(
     @InjectModel('order') private readonly orderModel: Model<Order>,
-    @InjectModel('product') private readonly productModel: Model<Product>,
     @InjectModel('user') private readonly userModel: Model<User>,
     private readonly emailService: EmailService,
+    private readonly jwtService: JwtService,
   ) {}
 
-  async createOrder(createOrderDto: CreateOrderDto): Promise<Order> {
-    const { user, products } = createOrderDto;
+  async createOrderFromPaypal(
+    createOrderDto: CreateOrderDto,
+    token: string,
+  ): Promise<Order> {
+    const { paypalOrderId, totalPrice, status } = createOrderDto;
+    console.log(paypalOrderId, 'es aris aidii');
+    console.log(totalPrice, 'es aris praisi');
+    console.log(status, 'es aris statusi');
+    console.log(token);
 
-    // Validate user exists
-    const existingUser = await this.userModel.findById(user);
+    // Decode the token
+    let decodedToken;
+    try {
+      decodedToken = this.jwtService.verify(token); // Verify the token using jwtService
+      console.log('Decoded Token:', decodedToken);
+
+      if (!decodedToken || !decodedToken.userId) {
+        throw new UnauthorizedException('Invalid or expired token');
+      }
+    } catch (error) {
+      console.log('Error during token verification:', error);
+      throw new UnauthorizedException('Invalid token');
+    }
+
+    const userId = decodedToken.userId;
+
+    // Fetch the user from the database using the user ID extracted from the token
+    const existingUser = await this.userModel.findById(userId);
     if (!existingUser) {
       throw new NotFoundException('User not found');
     }
 
-    let totalPrice = 0;
-    const updatedProducts = [];
-
-    // Validate products and calculate total price
-    for (const item of products) {
-      const existingProduct = await this.productModel.findById(item.product);
-      if (!existingProduct) {
-        throw new NotFoundException(
-          `Product with ID ${item.product} not found`,
-        );
-      }
-
-      // Use product's actual price
-      const price = existingProduct.price;
-      totalPrice += price * item.quantity;
-
-      updatedProducts.push({
-        product: item.product,
-        quantity: item.quantity,
-        price, // Store product's price in order
-      });
+    // Ensure totalPrice and status are provided
+    if (!totalPrice || !status) {
+      throw new Error('Missing total price or status');
     }
 
+    // Create a new order
     const newOrder = new this.orderModel({
-      user,
-      products: updatedProducts,
-      totalPrice,
-      status: createOrderDto.status || 'pending',
+      paypalOrderId: paypalOrderId,
+      totalPrice: totalPrice, // store as string or number based on your choice
+      status: status || 'pending',
+      date: new Date(),
     });
+    console.log(newOrder);
 
-    const savedOrder = await newOrder.save();
+    // Save the order to the database
+    const savedOrder: Order = await newOrder.save();
+    console.log(savedOrder, 'thats a saved order');
 
-    
-    await this.emailService.sendEmail(
-      existingUser.email, // Send to user's email
-      'Order Confirmation',
-      `Thank you for your order! Your order ID is: ${savedOrder._id}`,
-      `<p>Thank you for your order!</p><p>Your order ID is: <b>${savedOrder._id}</b></p><p>Total Price: $${savedOrder.totalPrice}</p>`,
-    );
+    existingUser.orders.push(savedOrder._id as ObjectId);
+    // Save the updated user document with the new order
+    await existingUser.save();
+
+    // Optionally, send a confirmation email
+    // await this.emailService.sendEmail(
+    //   existingUser.email,
+    //   'Order Confirmation',
+    //   `Thank you for your order! Your PayPal order ID is: ${savedOrder.paypalOrderId}`,
+    //   `<p>Thank you for your order!</p><p>Your PayPal order ID is: <b>${savedOrder.paypalOrderId}</b></p><p>Total Price: $${savedOrder.totalPrice}</p>`,
+    // );
 
     return savedOrder;
   }
+  
 
   async getAllOrders(): Promise<Order[]> {
-    return await this.orderModel
-      .find()
-      .populate('user')
-      .populate('products.product')
-      .exec();
+    return await this.orderModel.find().populate('user').exec();
   }
 
   async getOrderById(orderId: string): Promise<Order> {
-    const order = await this.orderModel
-      .findById(orderId)
-      .populate('user')
-      .populate('products.product')
-      .exec();
+    const objectId = new mongoose.Types.ObjectId(orderId);
+
+    console.log(objectId);
+    const order = await this.orderModel.findById(objectId).exec();
+
     if (!order) {
       throw new NotFoundException('Order not found');
     }
+
     return order;
   }
 }

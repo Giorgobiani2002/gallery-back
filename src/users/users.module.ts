@@ -13,7 +13,6 @@ import { AwsS3Service } from 'src/upload/aws-s3.service';
       { name: 'product', schema: ProductSchema },
       { name: 'user', schema: UserSchema },
       { name: 'order', schema: OrderSchema },
-      
     ]),
   ],
   controllers: [UsersController],
