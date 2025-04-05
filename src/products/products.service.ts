@@ -57,6 +57,31 @@ export class ProductsService {
     return this.productModel.find();
   }
 
+  async findFeatures(userId: string) {
+    const user = userId ? await this.userModel.findById(userId) : null;
+
+    const products = await this.productModel.find({ features: true }).populate({
+      path: 'user',
+      select: '-products -createdAt -__v -password -role -cart -orders -carts',
+    });
+
+    if (user) {
+      const favoriteProductIds = user.Favorites.map((id) => id.toString());
+
+      products.forEach((product) => {
+        product.isFavorite = favoriteProductIds.includes(
+          product._id.toString(),
+        );
+      });
+    } else {
+      products.forEach((product) => {
+        product.isFavorite = false;
+      });
+    }
+
+    return products;
+  }
+
   async findSelected(
     { take, skip }: QueryParamsLoadMoreDto,
     userId: string | null,
@@ -184,6 +209,27 @@ export class ProductsService {
       return [];
     }
   }
+
+  async Favorites(userId: string | null) {
+    if (userId) {
+      const User = await this.userModel.findById(userId);
+
+      const favoriteProductIds = User.Favorites.map((id) => id.toString());
+
+      const Products = await this.productModel
+        .find({ _id: { $in: favoriteProductIds } })
+        .populate({
+          path: 'user',
+          select:
+            '-products -createdAt -__v -password -role -cart -orders -carts',
+        });
+
+      return Products;
+    } else {
+      return [];
+    }
+  }
+
   async update(id: string, updateProductDto: UpdateProductDto) {
     const product = await this.productModel.findById(id);
 

@@ -49,6 +49,9 @@ export class Product extends Document {
   @Prop({ type: Boolean })
   isFavorite: boolean;
 
+  @Prop({ type: Boolean })
+  features: boolean;
+
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'user' })
   user: mongoose.Schema.Types.ObjectId;
 }
