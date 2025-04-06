@@ -11,8 +11,8 @@ import sharp from 'sharp';
 
 @Injectable()
 export class AwsS3Service {
-  private storageService;
-  private bucketName;
+  private storageService: S3Client;
+  private bucketName: string;
 
   constructor() {
     this.bucketName = process.env.AWS_BUCKET_NAME;
