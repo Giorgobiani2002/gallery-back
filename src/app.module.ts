@@ -12,6 +12,7 @@ import { EmailService } from './email/email.service';
 import { EmailModule } from './email/email.module';
 import { AwsS3Module } from './upload/aws-s3.module';
 import { PaypalModule } from './paypal/paypal.module';
+import { AuctionBiddingModule } from './auction-bidding/auction-bidding.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { PaypalModule } from './paypal/paypal.module';
     EmailModule,
     AwsS3Module,
     PaypalModule,
+    AuctionBiddingModule,
   ],
   controllers: [AppController],
   providers: [AppService, EmailService],

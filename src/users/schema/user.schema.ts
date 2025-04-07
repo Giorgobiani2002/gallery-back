@@ -42,6 +42,8 @@ export class User {
 
   @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'product', default: [] })
   Favorites: mongoose.Schema.Types.ObjectId[];
+  @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'auction' }])
+  wonAuctions: mongoose.Schema.Types.ObjectId[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
