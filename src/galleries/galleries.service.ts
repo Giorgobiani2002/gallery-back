@@ -5,18 +5,22 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Gallery } from './schema/gallery.schema';
 import { Product } from 'src/products/schema/product.schema';
+import { User } from 'src/users/schema/user.schema';
 
 @Injectable()
 export class GalleriesService {
   constructor(
     @InjectModel('gallery') private galleryModel: Model<Gallery>,
     @InjectModel('product') private productModel: Model<Product>,
+    @InjectModel('user') private userModel: Model<User>,
   ) {}
 
   create(createGalleryDto: CreateGalleryDto) {
     return 'This action adds a new gallery';
   }
-  async findAll() {
+  async findAll(userId: string | null) {
+    const user = userId ? await this.userModel.findById(userId) : null;
+
     const galleries = await this.galleryModel.find().populate('products');
 
     for (let i = 0; i < galleries.length; i++) {
@@ -24,6 +28,22 @@ export class GalleriesService {
         galleries[i].mainImgUrl = galleries[i].products[0].mainImgUrl;
         await galleries[i].save();
       }
+    }
+
+    const products = await this.productModel.find();
+
+    if (user) {
+      const favoriteProductIds = user.Favorites.map((id) => id.toString());
+
+      products.forEach((product) => {
+        product.isFavorite = favoriteProductIds.includes(
+          product._id.toString(),
+        );
+      });
+    } else {
+      products.forEach((product) => {
+        product.isFavorite = false;
+      });
     }
 
     return galleries;

@@ -42,6 +42,7 @@ export class ProductsService {
       ArtId: randomNum,
       artist: user.fullName,
       user: user._id,
+      isFavorite: false,
     });
 
     await newProduct.save();
