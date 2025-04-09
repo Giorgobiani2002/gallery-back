@@ -6,7 +6,7 @@ import {
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import { Product } from './schema/product.schema';
 import { User } from 'src/users/schema/user.schema';
 import { JwtService } from '@nestjs/jwt';
@@ -208,6 +208,32 @@ export class ProductsService {
 
     return updatedUser?.Favorites;
   }
+
+  async getMyFavorite(userId: string) {
+    if (!userId) throw new NotFoundException('userId not found');
+
+    const user = await this.userModel.findById(userId);
+
+    if (!User) throw new NotFoundException('user not found');
+
+    const favoriteProductIds = user.Favorites.map((id) => id.toString());
+
+    const products = await this.productModel.find().populate({
+      path: 'user',
+      select: '-products -createdAt -__v -password -role -cart -orders -carts',
+    });
+
+    products.forEach((product) => {
+      product.isFavorite = favoriteProductIds.includes(product._id.toString());
+    });
+
+    const favoriteProducts = products.filter(
+      (product) => product.isFavorite === true,
+    );
+
+    return favoriteProducts;
+  }
+
   async GetFavorites(userId: string | null) {
     if (userId) {
       const User = await this.userModel.findById(userId);
