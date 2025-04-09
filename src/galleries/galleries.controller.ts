@@ -44,8 +44,24 @@ export class GalleriesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.galleriesService.findOne(+id);
+  findOne(
+    @Param('id') id: string,
+    @Headers('authorization') authorization: string,
+  ) {
+    let userId = null;
+
+    if (authorization && authorization.startsWith('Bearer ')) {
+      const token = authorization.split(' ')[1];
+      let decodedToken: any;
+      try {
+        decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        userId = decodedToken.userId;
+      } catch (error) {
+        throw new NotFoundException('Invalid or expired token');
+      }
+    }
+
+    return this.galleriesService.findOne(id, userId);
   }
 
   @Patch(':id')
