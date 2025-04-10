@@ -16,6 +16,7 @@ export interface Product extends mongoose.Document {
   width: number;
   depth: number;
   isFavorite: boolean;
+  features: boolean;
   user: mongoose.Schema.Types.ObjectId;
 }
 
@@ -67,6 +68,9 @@ export const ProductSchema = new Schema({
     required: true,
   },
   isFavorite: {
+    type: Boolean,
+  },
+  features: {
     type: Boolean,
   },
   user: {
