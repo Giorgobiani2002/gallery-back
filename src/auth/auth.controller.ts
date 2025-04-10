@@ -24,6 +24,7 @@ export class AuthController {
   signUpBuyer(@Body() signUpBuyerDto: signUpBuyerDto) {
     return this.authService.signUpBuyer(signUpBuyerDto);
   }
+
   @Post('sign-up/seller')
   // @UseInterceptors(FileInterceptor('file'))
   // uploadFile(@UploadedFile() file: Express.Multer.File) {

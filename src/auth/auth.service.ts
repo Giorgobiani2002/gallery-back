@@ -28,25 +28,37 @@ export class AuthService {
   }
   async signUpSeller(signUpDto: signUpSellerDto) {
     const existUser = await this.usersService.findOneByEmail(signUpDto.email);
+
     if (existUser) throw new BadRequestException('user already exist');
+
     const hashedPass = await bcrypt.hash(signUpDto.password, 10);
+
     console.log(hashedPass);
+
     await this.usersService.create({
       ...signUpDto,
       password: hashedPass,
       role: Role.SELLER,
     });
+
     return 'user registered succesfully';
   }
 
   async signIn(SignInDto: SignInDto) {
     const existUser = await this.usersService.findOneByEmail(SignInDto.email);
+
     if (!existUser) throw new BadRequestException('Invalid Credentials');
+
     const isPassEqual = await bcrypt.compare(
       SignInDto.password,
       existUser.password,
     );
+
     if (!isPassEqual) throw new BadRequestException('Invalid Credentials');
+
+    if (existUser.verification === false)
+      throw new BadRequestException('you need verification to Sign In');
+
     const payLoad = {
       userId: existUser._id,
       userName: existUser.fullName,

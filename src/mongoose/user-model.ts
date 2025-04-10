@@ -16,6 +16,7 @@ export interface User extends mongoose.Document {
   profileUrl: string;
   userBio: string;
   favorites: mongoose.Schema.Types.ObjectId[];
+  verification: boolean;
 }
 
 export const UserSchema = new Schema({
@@ -73,5 +74,8 @@ export const UserSchema = new Schema({
     type: [mongoose.Schema.Types.ObjectId],
     ref: 'Product',
     default: [],
+  },
+  verification: {
+    type: Boolean,
   },
 });
