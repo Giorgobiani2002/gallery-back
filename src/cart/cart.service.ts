@@ -49,36 +49,36 @@ export class CartService {
       (item) => item.product.toString() === productId.toString(),
     );
   
-    // If the product exists, update the quantity and price
+    
     if (existingItemIndex >= 0) {
       const existingItem = cart.items[existingItemIndex];
-      existingItem.quantity = quantity; // Set the quantity to the new one (overwrite the old value)
-      existingItem.price = product.price * quantity; // Recalculate price based on new quantity
+      existingItem.quantity = quantity; 
+      existingItem.price = product.price * quantity; 
     } else {
-      // Otherwise, add the new product to the cart with the specified quantity
+      
       cart.items.push({
-        product: productId, // Add product ID
-        quantity, // Set the quantity
-        price: product.price * quantity, // Calculate price for the quantity
+        product: productId, 
+        quantity, 
+        price: product.price * quantity,
       });
     }
   
-    // Recalculate the total price of the cart
+   
     cart.totalPrice = cart.items.reduce((total, item) => total + item.price, 0);
   
-    // Save the updated cart
+   
     await cart.save();
   
-    // Update the user's cart array
+   
     const cartId = cart._id as mongoose.Schema.Types.ObjectId;
     const user = await this.userModel.findById(userId);
     
-    // Ensure the user's cart array is updated
+    
     if (user) {
-      // If the cart is not already in the user's carts array, add it
+     
       if (!user.carts.includes(cartId)) {
         user.carts.push(cartId);
-        await user.save(); // Save the user with the updated cart array
+        await user.save(); 
       }
     }
   
@@ -134,7 +134,7 @@ export class CartService {
       throw new NotFoundException('Cart not found');
     }
   
-    // Clear items in the cart
+    
     cart.items = [];
     cart.totalPrice = 0;
     await cart.save();

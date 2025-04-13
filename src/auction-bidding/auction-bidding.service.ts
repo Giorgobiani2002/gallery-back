@@ -16,7 +16,7 @@ import { Product } from 'src/products/schema/product.schema';
 export class AuctionBiddingService {
   constructor(
     @InjectModel('auction') private auctionModel: Model<Auction>,
-    @InjectModel("product") private productModel: Model<Product>,
+    @InjectModel('product') private productModel: Model<Product>,
     private jwtService: JwtService,
   ) {}
 
@@ -42,16 +42,15 @@ export class AuctionBiddingService {
   }
 
   async findOne(id: string) {
-    
     const auction = await this.auctionModel
       .findById(id)
-      .populate('product')  
+      .populate('product')
       .exec();
-  
+
     if (!auction) {
       throw new HttpException('Auction not found', HttpStatus.NOT_FOUND);
     }
-  
+
     return auction;
   }
 
@@ -79,6 +78,12 @@ export class AuctionBiddingService {
     if (new Date() > auction.endDate) {
       throw new HttpException(
         'Auction has already ended',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    if (new Date() < auction.startDate) {
+      throw new HttpException(
+        'Auction has not started yet',
         HttpStatus.BAD_REQUEST,
       );
     }
