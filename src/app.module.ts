@@ -19,6 +19,9 @@ import { Order } from './mongoose/order-model';
 import { Cart } from './mongoose/cart-model';
 import { GalleriesModule } from './galleries/galleries.module';
 import { Gallery } from './mongoose/gallery-model';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { EmailSenderService } from './email-sender/email-sender.service';
+import { EmailSenderModule } from './email-sender/email-sender.module';
 
 import('adminjs').then(({ AdminJS }) => {
   import('@adminjs/mongoose').then((AdminJSMongoose) => {
@@ -45,6 +48,17 @@ const authenticate = async (email: string, password: string) => {
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRoot(process.env.MONGO_URI),
+    MailerModule.forRoot({
+      transport: {
+        host: process.env.EMAIL_HOST,
+        port: 465,
+        secure: true,
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+      },
+    }),
     import('@adminjs/nestjs').then(({ AdminModule }) =>
       AdminModule.createAdminAsync({
         imports: [MongooseSchemasModule],
@@ -93,8 +107,9 @@ const authenticate = async (email: string, password: string) => {
     EmailModule,
     AwsS3Module,
     GalleriesModule,
+    EmailSenderModule,
   ],
   controllers: [AppController],
-  providers: [AppService, EmailService],
+  providers: [AppService, EmailService, EmailSenderService],
 })
 export class AppModule {}
