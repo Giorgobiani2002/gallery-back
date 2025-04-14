@@ -35,56 +35,49 @@ export class CartService {
     if (!product) {
       throw new NotFoundException('Product not found');
     }
-  
-    // Find the user's cart
-    let cart = await this.cartModel.findOne({ user: userId });
+
     
-    // If the user doesn't have a cart, create a new one
+    let cart = await this.cartModel.findOne({ user: userId });
+
+    
     if (!cart) {
       cart = new this.cartModel({ user: userId, items: [], totalPrice: 0 });
     }
-  
-    // Find if the product already exists in the cart
+
+   
     const existingItemIndex = cart.items.findIndex(
       (item) => item.product.toString() === productId.toString(),
     );
-  
-    
+
     if (existingItemIndex >= 0) {
       const existingItem = cart.items[existingItemIndex];
-      existingItem.quantity = quantity; 
-      existingItem.price = product.price * quantity; 
+      existingItem.quantity += quantity;
+      existingItem.price = product.price * existingItem.quantity;
     } else {
-      
       cart.items.push({
-        product: productId, 
-        quantity, 
+        product: productId,
+        quantity,
         price: product.price * quantity,
       });
     }
-  
-   
+
     cart.totalPrice = cart.items.reduce((total, item) => total + item.price, 0);
-  
-   
+
     await cart.save();
-  
-   
+
     const cartId = cart._id as mongoose.Schema.Types.ObjectId;
     const user = await this.userModel.findById(userId);
-    
-    
+
     if (user) {
-     
       if (!user.carts.includes(cartId)) {
         user.carts.push(cartId);
-        await user.save(); 
+        await user.save();
       }
     }
-  
+    console.log('Incoming quantity:', quantity);
+    console.log(cart);
     return cart;
   }
-  
 
   async removeFromCart(
     userId: mongoose.Types.ObjectId,
@@ -133,13 +126,11 @@ export class CartService {
     if (!cart) {
       throw new NotFoundException('Cart not found');
     }
-  
-    
+
     cart.items = [];
     cart.totalPrice = 0;
     await cart.save();
-  
+
     return cart;
   }
-
 }
