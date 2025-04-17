@@ -54,6 +54,7 @@ export class Product extends Document {
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'user' })
   user: mongoose.Schema.Types.ObjectId;
+  
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

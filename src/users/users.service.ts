@@ -22,7 +22,6 @@ export class UsersService {
       .find()
       .populate('orders')
       .populate('products')
-      .populate('orders.products')
       .exec();
   }
   async updateProfileImage(
@@ -39,14 +38,26 @@ export class UsersService {
   }
 
   async findOne(id: string) {
-    const user = await this.userModel.findById(id).populate({
-      path: 'products',
-      select: '-createdAt -__v',
-      populate: {
-        path: 'user',
-        select: 'fullName email role',
-      },
-    });
+    // Fetch user and populate both orders and products
+    const user = await this.userModel
+      .findById(id)
+      .populate({
+        path: 'products',  // Populate the 'products' field in the user
+        select: '-createdAt -__v',  // Exclude fields like createdAt and __v
+        populate: {
+          path: 'user',  // Inside products, populate the 'user' field
+          select: 'fullName email role',  // Only fetch these fields from the product's user
+        },
+      })
+      .populate({
+        path: 'orders',  // Populate the 'orders' field in the user
+        select: '-__v',  // Exclude __v from the orders
+        populate: {
+          path: 'user',  // Inside orders, populate the 'user' field
+          select: 'fullName email role',  // Only fetch these fields from the order's user
+        },
+      });
+  
     return user;
   }
 

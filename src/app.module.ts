@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { getModelToken, MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { ProductsModule } from './products/products.module';
@@ -11,6 +11,8 @@ import { CartModule } from './cart/cart.module';
 import { EmailService } from './email/email.service';
 import { EmailModule } from './email/email.module';
 import { AwsS3Module } from './upload/aws-s3.module';
+import { PaypalModule } from './paypal/paypal.module';
+import { AuctionBiddingModule } from './auction-bidding/auction-bidding.module';
 import { MongooseSchemasModule } from './mongoose/mogoose.module';
 import { Model } from 'mongoose';
 import { User } from './mongoose/user-model';
@@ -106,6 +108,8 @@ const authenticate = async (email: string, password: string) => {
     CartModule,
     EmailModule,
     AwsS3Module,
+    PaypalModule,
+    AuctionBiddingModule,
     GalleriesModule,
     EmailSenderModule,
   ],
