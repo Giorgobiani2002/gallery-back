@@ -13,7 +13,7 @@ import { ProductSchema } from 'src/products/schema/product.schema';
       { name: 'product', schema: ProductSchema },
     ]),
     JwtModule.register({
-      secret: 'GELASUYVARSMAWONI',
+      secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '1h' },
     }),
   ],

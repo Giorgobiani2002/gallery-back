@@ -71,6 +71,9 @@ export class AuctionBiddingService {
       throw new HttpException('Token not found', HttpStatus.UNAUTHORIZED);
     }
 
+    console.log('TOKEN:', token);
+    console.log('SECRET:', process.env.JWT_SECRET);
+
     // try {
     const decoded = this.jwtService.verify(token);
     const bidderId = decoded.userId;
