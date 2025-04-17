@@ -77,6 +77,24 @@ export class ProductsController {
     return this.productsService.findAll();
   }
 
+  @Get('Features')
+  findFeatures(@Headers('authorization') authorization: string) {
+    let userId = null;
+
+    if (authorization && authorization.startsWith('Bearer ')) {
+      const token = authorization.split(' ')[1];
+      let decodedToken: any;
+      try {
+        decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        userId = decodedToken.userId;
+      } catch (error) {
+        throw new NotFoundException('Invalid or expired token');
+      }
+    }
+
+    return this.productsService.findFeatures(userId);
+  }
+
   @Get('Select')
   findSelected(
     @Query() queryParams: QueryParamsLoadMoreDto,
@@ -132,6 +150,23 @@ export class ProductsController {
     };
   }
 
+  @Get('favorite')
+  getMyFavorite(@Headers('authorization') authorization: string) {
+    let userId = null;
+
+    if (authorization && authorization.startsWith('Bearer ')) {
+      const token = authorization.split(' ')[1];
+      let decodedToken: any;
+      try {
+        decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        userId = decodedToken.userId;
+      } catch (error) {
+        throw new NotFoundException('Invalid or expired token');
+      }
+    }
+    return this.productsService.getMyFavorite(userId);
+  }
+
   @Get('findOne/:id')
   findOne(@Param('id') id: string) {
     return this.productsService.findOne(id);
@@ -174,6 +209,24 @@ export class ProductsController {
     }
 
     return this.productsService.GetFavorites(userId);
+  }
+
+  @Get('Favorite')
+  Favorites(@Headers('authorization') authorization: string) {
+    let userId = null;
+
+    if (authorization && authorization.startsWith('Bearer ')) {
+      const token = authorization.split(' ')[1];
+      let decodedToken: any;
+      try {
+        decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        userId = decodedToken.userId;
+      } catch (error) {
+        throw new NotFoundException('Invalid or expired token');
+      }
+    }
+
+    return this.productsService.Favorites(userId);
   }
 
   // @UseGuards(SellerGuard)

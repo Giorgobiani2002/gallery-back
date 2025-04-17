@@ -5,6 +5,7 @@ import {
   Post,
   Req,
   UploadedFile,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -14,23 +15,47 @@ import { SignInDto } from './dto/sign-in-dto';
 import { authGuard } from './guards/auth.guard';
 import { GoogleAuthGuard } from './guards/google-oauth.guard';
 import { signUpSellerDto } from './dto/sign-upSeller.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  AnyFilesInterceptor,
+  FileInterceptor,
+  FilesInterceptor,
+} from '@nestjs/platform-express';
+import { AwsS3Service } from 'src/upload/aws-s3.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private s3Service: AwsS3Service,
+  ) {}
 
   @Post('sign-up/buyer')
   signUpBuyer(@Body() signUpBuyerDto: signUpBuyerDto) {
     return this.authService.signUpBuyer(signUpBuyerDto);
   }
+
   @Post('sign-up/seller')
-  // @UseInterceptors(FileInterceptor('file'))
-  // uploadFile(@UploadedFile() file: Express.Multer.File) {
-  //   console.log(file);
-  // }
-  signUpSeller(@Body() signUpSellerDto: signUpSellerDto) {
-    return this.authService.signUpSeller(signUpSellerDto);
+  @UseInterceptors(FilesInterceptor('files'))
+  async signUpSeller(
+    @UploadedFiles() files: Express.Multer.File[],
+    @Body() signUpSellerDto: signUpSellerDto,
+  ) {
+    console.log(files, 'files');
+    const UploadedFiles = [];
+    for (const file of files) {
+      const path = Math.random().toString().slice(2);
+      const filePath = `images/${path}`;
+
+      await this.s3Service.uploadFile(filePath, file);
+
+      const uploadedImg = await this.s3Service.generateSignedUrl(path);
+
+      UploadedFiles.push(uploadedImg);
+    }
+
+    console.log(UploadedFiles);
+
+    return this.authService.signUpSeller(signUpSellerDto, UploadedFiles);
   }
 
   @UseGuards(GoogleAuthGuard)

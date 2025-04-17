@@ -7,12 +7,12 @@ import {
 import { Injectable } from '@nestjs/common';
 import { Readable } from 'stream';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import * as sharp from 'sharp';
+import sharp from 'sharp';
 
 @Injectable()
 export class AwsS3Service {
-  private storageService;
-  private bucketName;
+  private storageService: S3Client;
+  private bucketName: string;
 
   constructor() {
     this.bucketName = process.env.AWS_BUCKET_NAME;

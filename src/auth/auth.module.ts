@@ -5,6 +5,9 @@ import { UsersModule } from 'src/users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { EmailSenderService } from 'src/email-sender/email-sender.service';
+import { EmailSenderModule } from 'src/email-sender/email-sender.module';
+import { AwsS3Module } from 'src/upload/aws-s3.module';
 // import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
@@ -17,6 +20,8 @@ import { PassportModule } from '@nestjs/passport';
     PassportModule.register({ defaultStrategy: 'google' }),
 
     UsersModule,
+    EmailSenderModule,
+    AwsS3Module,
   ],
   controllers: [AuthController],
   providers: [AuthService],
