@@ -18,11 +18,7 @@ export class UsersService {
   }
 
   async findAll() {
-    return this.userModel
-      .find()
-      .populate('orders')
-      .populate('products')
-      .exec();
+    return this.userModel.find().populate('orders').populate('products').exec();
   }
   async updateProfileImage(
     userId: string,
@@ -42,22 +38,22 @@ export class UsersService {
     const user = await this.userModel
       .findById(id)
       .populate({
-        path: 'products',  // Populate the 'products' field in the user
-        select: '-createdAt -__v',  // Exclude fields like createdAt and __v
+        path: 'products', // Populate the 'products' field in the user
+        select: '-createdAt -__v', // Exclude fields like createdAt and __v
         populate: {
-          path: 'user',  // Inside products, populate the 'user' field
-          select: 'fullName email role',  // Only fetch these fields from the product's user
+          path: 'user', // Inside products, populate the 'user' field
+          select: 'fullName email role', // Only fetch these fields from the product's user
         },
       })
       .populate({
-        path: 'orders',  // Populate the 'orders' field in the user
-        select: '-__v',  // Exclude __v from the orders
+        path: 'orders', // Populate the 'orders' field in the user
+        select: '-__v', // Exclude __v from the orders
         populate: {
-          path: 'user',  // Inside orders, populate the 'user' field
-          select: 'fullName email role',  // Only fetch these fields from the order's user
+          path: 'user', // Inside orders, populate the 'user' field
+          select: 'fullName email role', // Only fetch these fields from the order's user
         },
       });
-  
+
     return user;
   }
 
@@ -104,7 +100,9 @@ export class UsersService {
       .select('+password');
     return user;
   }
+
   async update(id: string, updateUserDto: UpdateUserDto) {
+    console.log(updateUserDto, 'updateUserDto');
     const updateUser = await this.userModel.findByIdAndUpdate(
       id,
       updateUserDto,
