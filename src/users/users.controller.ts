@@ -136,8 +136,10 @@ export class UsersController {
   @Patch('')
   update(@Req() request, @Body() updateUserDto: UpdateUserDto) {
     const userId = request.userId;
+    console.log(userId, 'userId');
     return this.usersService.update(userId, updateUserDto);
   }
+
   @UseGuards(authGuard)
   @Delete('')
   remove(@Req() request) {

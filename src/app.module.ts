@@ -24,6 +24,7 @@ import { Gallery } from './mongoose/gallery-model';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EmailSenderService } from './email-sender/email-sender.service';
 import { EmailSenderModule } from './email-sender/email-sender.module';
+import { Auction } from './mongoose/auction-model';
 
 import('adminjs').then(({ AdminJS }) => {
   import('@adminjs/mongoose').then((AdminJSMongoose) => {
@@ -70,6 +71,7 @@ const authenticate = async (email: string, password: string) => {
           getModelToken('Order'),
           getModelToken('Cart'),
           getModelToken('Gallery'),
+          getModelToken('Auction'),
         ],
         useFactory: (
           userModel: Model<User>,
@@ -77,6 +79,7 @@ const authenticate = async (email: string, password: string) => {
           OrderModel: Model<Order>,
           CartModel: Model<Cart>,
           GalleryModel: Model<Gallery>,
+          AuctionModel: Model<Auction>,
         ) => ({
           adminJsOptions: {
             rootPath: '/admin',
@@ -86,6 +89,7 @@ const authenticate = async (email: string, password: string) => {
               { resource: OrderModel },
               { resource: CartModel },
               { resource: GalleryModel },
+              { resource: AuctionModel },
             ],
           },
           auth: {
