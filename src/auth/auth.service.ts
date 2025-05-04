@@ -76,7 +76,7 @@ export class AuthService {
 
     if (!isPassEqual) throw new BadRequestException('Invalid Credentials');
 
-    if (existUser.verification === false)
+    if (existUser.role === 'seller' && existUser.verification === false)
       throw new BadRequestException('you need verification to Sign In');
 
     const payLoad = {
