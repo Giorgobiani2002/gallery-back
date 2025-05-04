@@ -50,9 +50,7 @@ const authenticate = async (email: string, password: string) => {
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    MongooseModule.forRoot(
-      'mongodb+srv://nozadzegiorgi1011:<admin>@cluster0.f1g9ecn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
-    ),
+    MongooseModule.forRoot(process.env.MONGO_URI),
     MailerModule.forRoot({
       transport: {
         host: process.env.EMAIL_HOST,
