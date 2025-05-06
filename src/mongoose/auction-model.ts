@@ -7,10 +7,10 @@ export interface Auction extends mongoose.Document {
   startingPrice: number;
   startDate: Date;
   endDate: Date;
-  latestBidAmount: number;
-  winnerId?: mongoose.Schema.Types.ObjectId;
-  latestBidder?: mongoose.Schema.Types.ObjectId;
-  users: mongoose.Schema.Types.ObjectId[];
+  // latestBidAmount: number;
+  // winnerId?: mongoose.Schema.Types.ObjectId;
+  // latestBidder?: mongoose.Schema.Types.ObjectId;
+  // users: mongoose.Schema.Types.ObjectId[];
 }
 
 export const AuctionSchema = new Schema<Auction>({
@@ -31,22 +31,22 @@ export const AuctionSchema = new Schema<Auction>({
     type: Date,
     required: true,
   },
-  latestBidAmount: {
-    type: Number,
-    default: 0,
-  },
-  winnerId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-  },
-  latestBidder: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-  },
-  users: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-    },
-  ],
+  // latestBidAmount: {
+  //   type: Number,
+  //   default: 0,
+  // },
+  // winnerId: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: 'User',
+  // },
+  // latestBidder: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: 'User',
+  // },
+  // users: [
+  //   {
+  //     type: mongoose.Schema.Types.ObjectId,
+  //     ref: 'User',
+  //   },
+  // ],
 });

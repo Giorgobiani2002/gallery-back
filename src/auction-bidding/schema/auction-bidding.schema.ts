@@ -27,7 +27,7 @@ export class Auction extends Document {
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'user', required: false })
   latestBidder: mongoose.Schema.Types.ObjectId; 
-  @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }])  // An array of users who participated
+  @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }])  
   users: mongoose.Schema.Types.ObjectId[];
 }
 
