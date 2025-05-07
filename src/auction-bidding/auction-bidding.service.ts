@@ -11,12 +11,17 @@ import { Auction } from './schema/auction-bidding.schema';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Product } from 'src/products/schema/product.schema';
+import { User } from 'src/users/schema/user.schema';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { EmailSenderService } from 'src/email-sender/email-sender.service';
 
 @Injectable()
 export class AuctionBiddingService {
   constructor(
     @InjectModel('auction') private auctionModel: Model<Auction>,
     @InjectModel('product') private productModel: Model<Product>,
+    @InjectModel('user') private userModel: Model<User>,
+    private emailSenderService: EmailSenderService,
     private jwtService: JwtService,
   ) {}
 
@@ -126,6 +131,14 @@ export class AuctionBiddingService {
     if (auction.latestBidder) {
       auction.winnerId = auction.latestBidder;
       await auction.save();
+
+      await this.userModel.findByIdAndUpdate(
+        auction.latestBidder,
+        {
+          $addToSet: { wonAuctions: auction._id },
+        },
+        { new: true },
+      );
       return auction;
     } else {
       throw new HttpException(
@@ -141,5 +154,46 @@ export class AuctionBiddingService {
       throw new HttpException('Auction not found', HttpStatus.NOT_FOUND);
     }
     return auction;
+  }
+  @Cron(CronExpression.EVERY_10_SECONDS)
+  async handleAuctionEndings() {
+    const now = new Date();
+
+    const expiredAuctions = await this.auctionModel.find({
+      endDate: { $lte: now },
+      winnerId: { $exists: false },
+    });
+
+    for (const auction of expiredAuctions) {
+      if (auction.latestBidder) {
+        auction.winnerId = auction.latestBidder;
+        await auction.save();
+
+        const user = await this.userModel.findById(auction.latestBidder);
+        const product = await this.productModel.findById(auction.product);
+
+        if (user?.email && product?.title) {
+          const subject = `🎉 Congratulations, you won the auction for "${product.title}"!`;
+          const htmlContent = `
+          <div style="border: 2px solid #333; padding: 20px; font-family: Arial">
+            <h2>Hi ${user.fullName || 'Bidder'},</h2>
+            <p>You've won the auction for <strong>${product.title}</strong> with a bid of <strong>$${auction.latestBidAmount}</strong>.</p>
+            <p>We will contact you with delivery details soon.</p>
+            <p style="margin-top: 30px;">Thanks,<br/>Auction Gallery Team</p>
+          </div>
+        `;
+
+          await this.emailSenderService.sendEmailHtml(
+            user.email,
+            subject,
+            htmlContent,
+          );
+
+          console.log(` Email sent to ${user.email}`);
+        }
+      } else {
+        console.log(` Auction ${auction._id} ended. No bids placed.`);
+      }
+    }
   }
 }

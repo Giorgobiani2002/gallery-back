@@ -31,7 +31,7 @@ export class User {
   @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'cart', default: [] })
   carts: mongoose.Schema.Types.ObjectId[];
 
-  @Prop({ type: String, enum: Role, required: true })
+  @Prop({ type: String, enum: Role,  })
   role: string;
 
   @Prop({ type: String })

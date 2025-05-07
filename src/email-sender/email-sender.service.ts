@@ -19,12 +19,7 @@ export class EmailSenderService {
     console.log(info);
   }
 
-  async sendEmailHtml(to: string, subject: string) {
-    const html = `
-        <div style="border: 2px solid black">
-            <h1 style="color: red">Hello world</h1>
-        </div>
-        `;
+  async sendEmailHtml(to: string, subject: string, html: string) {
     const options = {
       from: 'web-10 <gio.nozadze1.10@gmail.com>',
       to,
@@ -34,11 +29,9 @@ export class EmailSenderService {
 
     try {
       const info = await this.emailService.sendMail(options);
-      console.log('Email Sent Successfully', info);
-
-      console.log(info, 'info');
+      console.log('HTML email sent successfully:', info);
     } catch (error) {
-      console.error('Error sending email:', error);
+      console.error('Error sending HTML email:', error);
     }
   }
 

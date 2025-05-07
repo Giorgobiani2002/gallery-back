@@ -5,19 +5,24 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt'; // Import the JwtModule
 import { AuctionSchema } from './schema/auction-bidding.schema';
 import { ProductSchema } from 'src/products/schema/product.schema';
+import { UserSchema } from 'src/mongoose/user-model';
+import { UsersModule } from 'src/users/users.module';
+import { EmailSenderService } from 'src/email-sender/email-sender.service';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: 'auction', schema: AuctionSchema },
       { name: 'product', schema: ProductSchema },
+      { name: 'user', schema: UserSchema },
     ]),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '1h' },
     }),
+    UsersModule,
   ],
   controllers: [AuctionBiddingController],
-  providers: [AuctionBiddingService],
+  providers: [AuctionBiddingService, EmailSenderService],
 })
 export class AuctionBiddingModule {}

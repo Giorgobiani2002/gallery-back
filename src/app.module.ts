@@ -25,6 +25,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { EmailSenderService } from './email-sender/email-sender.service';
 import { EmailSenderModule } from './email-sender/email-sender.module';
 import { Auction } from './mongoose/auction-model';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import('adminjs').then(({ AdminJS }) => {
   import('@adminjs/mongoose').then((AdminJSMongoose) => {
@@ -51,6 +52,7 @@ const authenticate = async (email: string, password: string) => {
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRoot(process.env.MONGO_URI),
+    ScheduleModule.forRoot(),
     MailerModule.forRoot({
       transport: {
         host: process.env.EMAIL_HOST,

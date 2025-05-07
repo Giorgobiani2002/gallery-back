@@ -52,6 +52,17 @@ export class AuthService {
     await this.EmailSenderService.sendEmailHtml(
       email,
       'Verify Your Seller Account',
+      `
+      <html>
+        <body>
+          <h1>Welcome to Our Platform!</h1>
+          <p>To complete the verification of your seller account, please click the link below:</p>
+          <p><a href="https://your-verification-link.com">Verify Account</a></p>
+          <p>If you did not request this, please ignore this email.</p>
+          <p>Best regards,<br>The Team</p>
+        </body>
+      </html>
+      `,
     );
 
     await this.EmailSenderService.sendEmailHtmltoAdmin(
@@ -87,6 +98,24 @@ export class AuthService {
 
     const accesToken = await this.jwtService.sign(payLoad, { expiresIn: '1h' });
     return { accesToken };
+  }
+  async signInWithGoogle(user) {
+    let existUser = await this.usersService.findOneByEmail(user.email);
+
+    if (!existUser) {
+      existUser = await this.usersService.create(user);
+    }
+
+    const payLoad = {
+      userId: existUser._id,
+    };
+    console.log(payLoad, 'es aris payloadi');
+
+    const accessToken = await this.jwtService.sign(payLoad, {
+      expiresIn: '1h',
+    });
+
+    return accessToken;
   }
 
   async getCurrentUser(userId: string) {
