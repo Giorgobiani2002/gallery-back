@@ -37,12 +37,22 @@ export class ProductsService {
 
     const randomNum = Math.random().toString().slice(2, 6);
 
+    const categoryTranslations: Record<string, string> = {
+      painting: 'მხატვრობა',
+      photography: 'ფოტოგრაფია',
+      sculpture: 'სკულპტურა',
+      mixedmedia: 'შერეული',
+    };
+
+    const categoryGeo = categoryTranslations[createProductDto.category] || '';
+
     const newProduct = new this.productModel({
       ...createProductDto,
       ArtId: randomNum,
       artist: user.fullName,
       user: user._id,
       isFavorite: false,
+      categoryGEO: categoryGeo,
     });
 
     await newProduct.save();
@@ -264,18 +274,20 @@ export class ProductsService {
     }
   }
 
-  async update(id: string, updateProductDto: UpdateProductDto) {
+  async update(id: string, updateProductDto: UpdateProductDto, userId: string) {
     const product = await this.productModel.findById(id);
 
-    if (!product) {
-      throw new NotFoundException('Product not found');
+    if (product.user.toString() !== userId) {
+      throw new UnauthorizedException('This is not Your Product');
     }
 
-    Object.assign(product, updateProductDto);
+    const updatedProduct = await this.productModel.findByIdAndUpdate(
+      id,
+      updateProductDto,
+      { new: true },
+    );
 
-    await product.save();
-
-    return product;
+    return updatedProduct;
   }
 
   async remove(id: string, userId: string) {
@@ -286,18 +298,9 @@ export class ProductsService {
     }
 
     if (product.user.toString() !== userId) {
-      throw new UnauthorizedException(
-        'You are not authorized to delete this product',
-      );
+      throw new UnauthorizedException('This is not Your Product');
     }
 
-    await this.productModel.findByIdAndDelete(id);
-
-    await this.userModel.updateMany(
-      { products: id },
-      { $pull: { products: id } },
-    );
-
-    return { message: 'Product removed successfully' };
+    return await this.productModel.findByIdAndDelete(id);
   }
 }

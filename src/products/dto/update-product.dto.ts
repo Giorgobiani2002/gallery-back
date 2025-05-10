@@ -1,21 +1,59 @@
-import { IsString, IsOptional, IsNumber } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsNumber,
+  IsNotEmpty,
+  IsEnum,
+} from 'class-validator';
+import { Category } from '../schema/product.schema';
 
 export class UpdateProductDto {
-  @IsOptional() 
+  // @IsNotEmpty()
+  // @IsString()
+  mainImgUrl: string;
+
+  // @IsNotEmpty()
+  // @IsString()
+  mockUpImgUrl: string;
+
+  @IsNotEmpty()
   @IsString()
-  readonly name?: string;
+  title: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  readonly description?: string;
+  titleGEO: string;
 
-  @IsOptional()
-  @IsNumber()
-  readonly price?: number;
+  @IsNotEmpty()
+  // @IsNumber()
+  year: number;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  readonly category?: string;
+  description: string;
 
-  
+  @IsNotEmpty()
+  @IsString()
+  descriptionGEO: string;
+
+  @IsNotEmpty()
+  @IsEnum(Category)
+  category: Category;
+
+  @IsNotEmpty()
+  // @IsNumber()
+  width: number;
+
+  @IsNotEmpty()
+  // @IsNumber()
+  height: number;
+
+  @IsNotEmpty()
+  // @IsNumber()
+  price: number;
+
+  // @IsNotEmpty()
+  // @Type(() => Number)
+  // // @IsNumber()
+  // total: number;
 }

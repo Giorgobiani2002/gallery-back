@@ -40,9 +40,9 @@ export class UsersController {
       throw new NotFoundException('Authorization header missing or invalid');
     }
 
-    if (!file) {
-      throw new NotFoundException('No file uploaded');
-    }
+    // if (!file) {
+    //   throw new NotFoundException('No file uploaded');
+    // }
 
     if (
       !body ||
@@ -55,19 +55,23 @@ export class UsersController {
       );
     }
 
-    if (!file.mimetype.startsWith('image/')) {
+    if (file && !file.mimetype.startsWith('image/')) {
       throw new NotFoundException(
         'Invalid file type. Please upload an image file',
       );
     }
 
-    const imageName = Math.random().toString().slice(2);
+    let profileImgUrl = null;
 
-    const profileImgPath = `images/${imageName}`;
+    if (file) {
+      const imageName = Math.random().toString().slice(2);
 
-    await this.s3Service.uploadFile(profileImgPath, file);
+      const profileImgPath = `images/${imageName}`;
 
-    const profileImgUrl = await this.s3Service.generateSignedUrl(imageName);
+      await this.s3Service.uploadFile(profileImgPath, file);
+
+      profileImgUrl = await this.s3Service.generateSignedUrl(imageName);
+    }
 
     const token = authorization.split(' ')[1];
     let decodedToken: any;

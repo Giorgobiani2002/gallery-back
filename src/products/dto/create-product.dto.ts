@@ -16,12 +16,20 @@ export class CreateProductDto {
   title: string;
 
   @IsNotEmpty()
+  @IsString()
+  titleGEO: string;
+
+  @IsNotEmpty()
   // @IsNumber()
   year: number;
 
   @IsNotEmpty()
   @IsString()
   description: string;
+
+  @IsNotEmpty()
+  @IsString()
+  descriptionGEO: string;
 
   @IsNotEmpty()
   @IsEnum(Category)

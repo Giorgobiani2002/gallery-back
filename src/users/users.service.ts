@@ -22,15 +22,21 @@ export class UsersService {
   }
   async updateProfileImage(
     userId: string,
-
     profileImgUrl: string,
     userBio: string,
   ) {
-    const updatedUser = await this.userModel.findByIdAndUpdate(userId, {
-      profileUrl: profileImgUrl,
-      userBio,
-    });
-    return updatedUser;
+    if (profileImgUrl !== null) {
+      const updatedUser = await this.userModel.findByIdAndUpdate(userId, {
+        profileUrl: profileImgUrl,
+        userBio,
+      });
+      return updatedUser;
+    } else {
+      const updatedUser = await this.userModel.findByIdAndUpdate(userId, {
+        userBio,
+      });
+      return updatedUser;
+    }
   }
 
   async findOne(id: string) {
