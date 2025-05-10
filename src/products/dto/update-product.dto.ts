@@ -8,52 +8,47 @@ import {
 import { Category } from '../schema/product.schema';
 
 export class UpdateProductDto {
-  // @IsNotEmpty()
-  // @IsString()
-  mainImgUrl: string;
-
-  // @IsNotEmpty()
-  // @IsString()
-  mockUpImgUrl: string;
-
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  title: string;
+  mainImgUrl?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  titleGEO: string;
+  mockUpImgUrl?: string;
 
-  @IsNotEmpty()
-  // @IsNumber()
-  year: number;
-
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  description: string;
+  title?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  descriptionGEO: string;
+  titleGEO?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
+  @IsNumber()
+  year?: number;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsString()
+  descriptionGEO?: string;
+
+  @IsOptional()
   @IsEnum(Category)
-  category: Category;
+  category?: Category;
 
-  @IsNotEmpty()
-  // @IsNumber()
-  width: number;
+  @IsOptional()
+  @IsNumber()
+  width?: number;
 
-  @IsNotEmpty()
-  // @IsNumber()
-  height: number;
+  @IsOptional()
+  @IsNumber()
+  height?: number;
 
-  @IsNotEmpty()
-  // @IsNumber()
-  price: number;
-
-  // @IsNotEmpty()
-  // @Type(() => Number)
-  // // @IsNumber()
-  // total: number;
+  @IsOptional()
+  @IsNumber()
+  price?: number;
 }
