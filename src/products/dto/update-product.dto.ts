@@ -25,7 +25,7 @@ export class UpdateProductDto {
   titleGEO?: string;
 
   @IsOptional()
-  @IsNumber()
+  // @IsNumber()
   year?: number;
 
   @IsOptional()
@@ -41,14 +41,14 @@ export class UpdateProductDto {
   category?: Category;
 
   @IsOptional()
-  @IsNumber()
+  // @IsNumber()
   width?: number;
 
   @IsOptional()
-  @IsNumber()
+  // @IsNumber()
   height?: number;
 
   @IsOptional()
-  @IsNumber()
+  // @IsNumber()
   price?: number;
 }
