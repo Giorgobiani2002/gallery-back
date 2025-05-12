@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { getModelToken, MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { ProductsModule } from './products/products.module';
@@ -26,15 +26,11 @@ import { EmailSenderService } from './email-sender/email-sender.service';
 import { EmailSenderModule } from './email-sender/email-sender.module';
 import { Auction } from './mongoose/auction-model';
 import { ScheduleModule } from '@nestjs/schedule';
+import path from 'path';
+// import { dynamicImport } from './utils/dynamic-import';
 
-import('adminjs').then(({ AdminJS }) => {
-  import('@adminjs/mongoose').then((AdminJSMongoose) => {
-    AdminJS.registerAdapter({
-      Resource: AdminJSMongoose.Resource,
-      Database: AdminJSMongoose.Database,
-    });
-  });
-});
+export const dynamicImport = async (packageName: string) =>
+  new Function(`return import('${packageName}')`)();
 
 const DEFAULT_ADMIN = {
   email: 'admin@example.com',
@@ -48,78 +44,115 @@ const authenticate = async (email: string, password: string) => {
   return null;
 };
 
-@Module({
-  imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
-    MongooseModule.forRoot(process.env.MONGO_URI),
-    ScheduleModule.forRoot(),
-    MailerModule.forRoot({
-      transport: {
-        host: process.env.EMAIL_HOST,
-        port: 465,
-        secure: true,
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
+export const createAppModule = async () => {
+  const AdminJSImport = await dynamicImport('adminjs');
+  const AdminJS = AdminJSImport.default;
+  const ComponentLoader = AdminJSImport.ComponentLoader;
+  const componentLoader = new ComponentLoader();
+
+  const imageComponentId = componentLoader.add(
+    'ImageComponent',
+    path.join(__dirname, './mongoose/components/ImageComponent'),
+  );
+
+  const AdminJSMongoose = await dynamicImport('@adminjs/mongoose');
+  const { AdminModule } = await dynamicImport('@adminjs/nestjs');
+
+  AdminJS.registerAdapter({
+    Resource: AdminJSMongoose.Resource,
+    Database: AdminJSMongoose.Database,
+  });
+
+  const AdminPanelModule = AdminModule.createAdminAsync({
+    imports: [MongooseSchemasModule],
+    inject: [
+      getModelToken('User'),
+      getModelToken('Product'),
+      getModelToken('Order'),
+      getModelToken('Cart'),
+      getModelToken('Gallery'),
+      getModelToken('Auction'),
+    ],
+    useFactory: async (
+      userModel: Model<User>,
+      ProductModel: Model<Product>,
+      OrderModel: Model<Order>,
+      CartModel: Model<Cart>,
+      GalleryModel: Model<Gallery>,
+      AuctionModel: Model<Auction>,
+    ) => {
+      return {
+        adminJsOptions: {
+          rootPath: '/admin',
+          componentLoader,
+          resources: [
+            { resource: userModel },
+            {
+              resource: ProductModel,
+              options: {
+                properties: {
+                  mainImgUrl: {
+                    components: {
+                      list: imageComponentId,
+                      show: imageComponentId,
+                    },
+                  },
+                },
+              },
+            },
+            { resource: OrderModel },
+            { resource: CartModel },
+            { resource: GalleryModel },
+            { resource: AuctionModel },
+          ],
         },
-      },
-    }),
-    import('@adminjs/nestjs').then(({ AdminModule }) =>
-      AdminModule.createAdminAsync({
-        imports: [MongooseSchemasModule],
-        inject: [
-          getModelToken('User'),
-          getModelToken('Product'),
-          getModelToken('Order'),
-          getModelToken('Cart'),
-          getModelToken('Gallery'),
-          getModelToken('Auction'),
-        ],
-        useFactory: (
-          userModel: Model<User>,
-          ProductModel: Model<Product>,
-          OrderModel: Model<Order>,
-          CartModel: Model<Cart>,
-          GalleryModel: Model<Gallery>,
-          AuctionModel: Model<Auction>,
-        ) => ({
-          adminJsOptions: {
-            rootPath: '/admin',
-            resources: [
-              { resource: userModel },
-              { resource: ProductModel },
-              { resource: OrderModel },
-              { resource: CartModel },
-              { resource: GalleryModel },
-              { resource: AuctionModel },
-            ],
-          },
+        auth: {
+          authenticate,
+          cookieName: 'adminjs',
+          cookiePassword: 'secret',
+        },
+        sessionOptions: {
+          resave: true,
+          saveUninitialized: true,
+          secret: 'secret',
+        },
+      };
+    },
+  });
+
+  @Module({
+    imports: [
+      ConfigModule.forRoot({ isGlobal: true }),
+      MongooseModule.forRoot(process.env.MONGO_URI),
+      ScheduleModule.forRoot(),
+      MailerModule.forRoot({
+        transport: {
+          host: process.env.EMAIL_HOST,
+          port: 465,
+          secure: true,
           auth: {
-            authenticate,
-            cookieName: 'adminjs',
-            cookiePassword: 'secret',
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
           },
-          sessionOptions: {
-            resave: true,
-            saveUninitialized: true,
-            secret: 'secret',
-          },
-        }),
+        },
       }),
-    ),
-    UsersModule,
-    AuthModule,
-    ProductsModule,
-    OrderModule,
-    CartModule,
-    EmailModule,
-    AwsS3Module,
-    PaypalModule,
-    AuctionBiddingModule,
-    GalleriesModule,
-    EmailSenderModule,
-  ],
-  controllers: [AppController],
-  providers: [AppService, EmailService, EmailSenderService],
-})
-export class AppModule {}
+      AdminPanelModule,
+      UsersModule,
+      AuthModule,
+      ProductsModule,
+      OrderModule,
+      CartModule,
+      EmailModule,
+      AwsS3Module,
+      PaypalModule,
+      AuctionBiddingModule,
+      GalleriesModule,
+      EmailSenderModule,
+    ],
+    controllers: [AppController],
+    providers: [AppService, EmailService, EmailSenderService],
+  })
+  class AppModule {}
+
+  return AppModule;
+};
