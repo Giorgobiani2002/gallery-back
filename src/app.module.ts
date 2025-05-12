@@ -97,6 +97,12 @@ export const createAppModule = async () => {
                       show: imageComponentId,
                     },
                   },
+                  mockUpImgUrl: {
+                    components: {
+                      list: imageComponentId,
+                      show: imageComponentId,
+                    },
+                  },
                 },
               },
             },

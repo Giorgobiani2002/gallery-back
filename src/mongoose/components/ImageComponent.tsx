@@ -17,16 +17,20 @@ const ImageComponent: React.FC<Props> = ({ record, property }) => {
   }
 
   return (
-    <img
-      src={imageUrl}
-      alt="Preview"
-      style={{
-        maxWidth: '100px',
-        maxHeight: '100px',
-        objectFit: 'contain',
-        borderRadius: '6px',
-      }}
-    />
+    <div>
+      <a href={imageUrl} target="_blank" rel="noopener noreferrer">
+        <img
+          src={imageUrl}
+          alt="Preview"
+          style={{
+            maxWidth: '100px',
+            maxHeight: '100px',
+            objectFit: 'contain',
+            borderRadius: '6px',
+          }}
+        />
+      </a>
+    </div>
   );
 };
 
