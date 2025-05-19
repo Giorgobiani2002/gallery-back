@@ -20,14 +20,19 @@ export class AuthService {
 
   async signUpBuyer(signUpDto: signUpBuyerDto) {
     const existUser = await this.usersService.findOneByEmail(signUpDto.email);
+
     if (existUser) throw new BadRequestException('user already exist');
+
     const hashedPass = await bcrypt.hash(signUpDto.password, 10);
+
     console.log(hashedPass);
+
     await this.usersService.create({
       ...signUpDto,
       password: hashedPass,
       role: Role.BUYER,
     });
+
     return 'user registered succesfully';
   }
 

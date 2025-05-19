@@ -15,6 +15,10 @@ export class signUpBuyerDto {
   fullName: string;
 
   @IsNotEmpty()
+  @IsString()
+  fullNameGEO: string;
+
+  @IsNotEmpty()
   @IsEmail()
   email: string;
 

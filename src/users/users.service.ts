@@ -94,7 +94,7 @@ export class UsersService {
 
   async getAllArtists() {
     return this.userModel
-      .find({ role: 'seller' })
+      .find({ role: 'seller', verification: true })
       .select(
         '-products -createdAt -__v -password -role -cart -orders -carts -email',
       );

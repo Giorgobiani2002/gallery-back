@@ -5,7 +5,6 @@ import {
   IsOptional,
   IsString,
   Length,
-  isString,
 } from 'class-validator';
 import { Role } from 'src/enums/roles.enum';
 
@@ -15,6 +14,10 @@ export class CreateUserDto {
   fullName: string;
 
   @IsNotEmpty()
+  @IsString()
+  fullNameGEO: string;
+
+  @IsNotEmpty()
   @IsEmail()
   email: string;
 
@@ -22,6 +25,7 @@ export class CreateUserDto {
   @IsString()
   @Length(6, 20)
   password: string;
+
   @IsNotEmpty()
   @IsString()
   role: Role;
