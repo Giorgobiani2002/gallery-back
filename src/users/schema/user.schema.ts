@@ -43,6 +43,9 @@ export class User {
   @Prop({ type: String })
   userBio: string;
 
+  @Prop({ type: String })
+  userBioGEO: string;
+
   @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'product', default: [] })
   Favorites: mongoose.Schema.Types.ObjectId[];
 

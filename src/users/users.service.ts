@@ -24,6 +24,7 @@ export class UsersService {
     userId: string,
     profileImgUrl: string,
     userBio: string,
+    userBioGEO: string,
   ) {
     if (profileImgUrl !== null) {
       const updatedUser = await this.userModel.findByIdAndUpdate(userId, {
@@ -34,6 +35,7 @@ export class UsersService {
     } else {
       const updatedUser = await this.userModel.findByIdAndUpdate(userId, {
         userBio,
+        userBioGEO,
       });
       return updatedUser;
     }

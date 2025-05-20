@@ -34,7 +34,7 @@ export class UsersController {
   async uploadProfile(
     @Headers('authorization') authorization: string,
     @UploadedFile() file: Express.Multer.File,
-    @Body() body: { userBio: string },
+    @Body() body: { userBio: string; userBioGEO: string },
   ) {
     if (!authorization || !authorization.startsWith('Bearer ')) {
       throw new NotFoundException('Authorization header missing or invalid');
@@ -47,6 +47,8 @@ export class UsersController {
     if (
       !body ||
       !body.userBio ||
+      typeof body.userBioGEO !== 'string' ||
+      body.userBioGEO.trim() === '' ||
       typeof body.userBio !== 'string' ||
       body.userBio.trim() === ''
     ) {
@@ -83,12 +85,13 @@ export class UsersController {
 
     const userId = decodedToken.userId;
     console.log(userId);
-    const { userBio } = body;
+    const { userBio, userBioGEO } = body;
 
     const user = await this.usersService.updateProfileImage(
       userId,
       profileImgUrl,
       userBio,
+      userBioGEO,
     );
 
     return {
