@@ -98,6 +98,7 @@ export class AuthService {
     const payLoad = {
       userId: existUser._id,
       userName: existUser.fullName,
+      userNameGEO: existUser.fullNameGEO,
       userRole: existUser.role,
     };
 
