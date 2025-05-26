@@ -13,6 +13,8 @@ import {
   UploadedFiles,
   NotFoundException,
   UploadedFile,
+  Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -108,6 +110,15 @@ export class UsersController {
   @Get('artists')
   getAllArtists() {
     return this.usersService.getAllArtists();
+  }
+
+  @Get('search-suggestions')
+  async getSuggestions(@Query('q') query: string) {
+    if (!query || query.trim() === '') {
+      throw new BadRequestException('ძებნის ველი ცარიელია');
+    }
+
+    return this.usersService.getSuggestions(query);
   }
 
   @Get(':id')

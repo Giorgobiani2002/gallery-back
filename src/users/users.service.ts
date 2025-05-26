@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -107,6 +107,45 @@ export class UsersService {
       .findOne({ email: email })
       .select('+password');
     return user;
+  }
+
+  async getSuggestions(query: string) {
+    const searchRegex = new RegExp(query, 'i');
+
+    const artworks = await this.productModel
+      .find(
+        {
+          $or: [{ title: searchRegex }, { titleGEO: searchRegex }],
+        },
+        {
+          _id: 1,
+          title: 1,
+          titleGEO: 1,
+          mainImgUrl: 1,
+        },
+      )
+      .limit(5);
+
+    const artists = await this.userModel
+      .find(
+        {
+          $or: [{ fullName: searchRegex }, { fullNameGEO: searchRegex }],
+          verification: true,
+        },
+        {
+          _id: 1,
+          fullName: 1,
+          fullNameGEO: 1,
+          profileUrl: 1,
+        },
+      )
+      .limit(5);
+
+    if (artworks.length === 0 && artists.length === 0) {
+      throw new NotFoundException('შესაბამისობა ვერ მოიძებნა');
+    }
+
+    return { artworks, artists };
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
