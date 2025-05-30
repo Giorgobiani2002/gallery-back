@@ -179,6 +179,37 @@ export class PaypalService {
       throw new Error('Error capturing PayPal payment');
     }
   }
+  async createAuctionPaymentOrder(userEmail: string, amount: number) {
+    const currency = 'USD';
+    const returnUrl = `http://localhost:3000/paypal-success`;
+    const cancelUrl = `http://localhost:3000/paypal-cancel`;
+
+    const request = new paypal.orders.OrdersCreateRequest();
+    request.prefer('return=representation');
+    request.requestBody({
+      intent: 'CAPTURE',
+      purchase_units: [
+        {
+          amount: {
+            currency_code: currency,
+            value: amount.toFixed(2),
+          },
+          description: `Auction Payment`,
+        },
+      ],
+      application_context: {
+        return_url: returnUrl,
+        cancel_url: cancelUrl,
+      },
+    });
+
+    try {
+      const order = await this.client.execute(request);
+      return order.result;
+    } catch (err) {
+      throw new Error('Error creating PayPal order');
+    }
+  }
 
   // Handle the success after payment capture
   // async handlePaymentSuccess(orderId: string, payerId: string) {

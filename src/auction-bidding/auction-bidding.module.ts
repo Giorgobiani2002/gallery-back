@@ -8,6 +8,7 @@ import { ProductSchema } from 'src/products/schema/product.schema';
 import { UserSchema } from 'src/mongoose/user-model';
 import { UsersModule } from 'src/users/users.module';
 import { EmailSenderService } from 'src/email-sender/email-sender.service';
+import { PaypalModule } from 'src/paypal/paypal.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { EmailSenderService } from 'src/email-sender/email-sender.service';
       signOptions: { expiresIn: '1h' },
     }),
     UsersModule,
+    PaypalModule,
   ],
   controllers: [AuctionBiddingController],
   providers: [AuctionBiddingService, EmailSenderService],
