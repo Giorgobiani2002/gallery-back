@@ -13,6 +13,8 @@ import {
   UploadedFiles,
   NotFoundException,
   UploadedFile,
+  Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -34,19 +36,21 @@ export class UsersController {
   async uploadProfile(
     @Headers('authorization') authorization: string,
     @UploadedFile() file: Express.Multer.File,
-    @Body() body: { userBio: string },
+    @Body() body: { userBio: string; userBioGEO: string },
   ) {
     if (!authorization || !authorization.startsWith('Bearer ')) {
       throw new NotFoundException('Authorization header missing or invalid');
     }
 
-    if (!file) {
-      throw new NotFoundException('No file uploaded');
-    }
+    // if (!file) {
+    //   throw new NotFoundException('No file uploaded');
+    // }
 
     if (
       !body ||
       !body.userBio ||
+      typeof body.userBioGEO !== 'string' ||
+      body.userBioGEO.trim() === '' ||
       typeof body.userBio !== 'string' ||
       body.userBio.trim() === ''
     ) {
@@ -55,19 +59,23 @@ export class UsersController {
       );
     }
 
-    if (!file.mimetype.startsWith('image/')) {
+    if (file && !file.mimetype.startsWith('image/')) {
       throw new NotFoundException(
         'Invalid file type. Please upload an image file',
       );
     }
 
-    const imageName = Math.random().toString().slice(2);
+    let profileImgUrl = null;
 
-    const profileImgPath = `images/${imageName}`;
+    if (file) {
+      const imageName = Math.random().toString().slice(2);
 
-    await this.s3Service.uploadFile(profileImgPath, file);
+      const profileImgPath = `images/${imageName}`;
 
-    const profileImgUrl = await this.s3Service.generateSignedUrl(imageName);
+      await this.s3Service.uploadFile(profileImgPath, file);
+
+      profileImgUrl = await this.s3Service.generateSignedUrl(imageName);
+    }
 
     const token = authorization.split(' ')[1];
     let decodedToken: any;
@@ -79,12 +87,13 @@ export class UsersController {
 
     const userId = decodedToken.userId;
     console.log(userId);
-    const { userBio } = body;
+    const { userBio, userBioGEO } = body;
 
     const user = await this.usersService.updateProfileImage(
       userId,
       profileImgUrl,
       userBio,
+      userBioGEO,
     );
 
     return {
@@ -101,6 +110,15 @@ export class UsersController {
   @Get('artists')
   getAllArtists() {
     return this.usersService.getAllArtists();
+  }
+
+  @Get('search-suggestions')
+  async getSuggestions(@Query('q') query: string) {
+    if (!query || query.trim() === '') {
+      throw new BadRequestException('ძებნის ველი ცარიელია');
+    }
+
+    return this.usersService.getSuggestions(query);
   }
 
   @Get(':id')

@@ -231,8 +231,52 @@ export class ProductsController {
 
   // @UseGuards(SellerGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productsService.update(id, updateProductDto);
+  @UseInterceptors(FilesInterceptor('files'))
+  async update(
+    @Param('id') id: string,
+    @Body() updateProductDto: UpdateProductDto,
+    @Headers('authorization') authorization: string,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    if (!authorization || !authorization.startsWith('Bearer ')) {
+      throw new UnauthorizedException(
+        'Authorization header missing or invalid',
+      );
+    }
+
+    const token = authorization.split(' ')[1];
+    let decodedToken: any;
+
+    try {
+      decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (error) {
+      throw new UnauthorizedException('Invalid or expired token');
+    }
+
+    const userId = decodedToken.userId;
+
+    if (files && files.length > 0) {
+      const [mainImg, mockUpImg] = files;
+
+      if (mainImg) {
+        const mainImgPath = Math.random().toString().slice(2);
+        const fileMainImgPath = `images/${mainImgPath}`;
+        await this.s3Service.uploadFile(fileMainImgPath, mainImg);
+        const mainImgUrl = await this.s3Service.generateSignedUrl(mainImgPath);
+        updateProductDto.mainImgUrl = mainImgUrl;
+      }
+
+      if (mockUpImg) {
+        const mockUpImgPath = Math.random().toString().slice(2);
+        const fileMockUpImgPath = `images/${mockUpImgPath}`;
+        await this.s3Service.uploadFile(fileMockUpImgPath, mockUpImg);
+        const mockUpImgUrl =
+          await this.s3Service.generateSignedUrl(mockUpImgPath);
+        updateProductDto.mockUpImgUrl = mockUpImgUrl;
+      }
+    }
+
+    return this.productsService.update(id, updateProductDto, userId);
   }
 
   // @UseGuards(SellerGuard)
@@ -241,16 +285,24 @@ export class ProductsController {
     @Param('id') id: string,
     @Headers('authorization') authorization: string,
   ) {
-    if (!authorization || !authorization.startsWith('Bearer ')) {
-      throw new BadRequestException('Authorization header missing or INVALID');
+    let userId = null;
+
+    console.log(authorization);
+
+    if (authorization && authorization.startsWith('Bearer ')) {
+      const token = authorization.split(' ')[1];
+      let decodedToken: any;
+      try {
+        decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        console.log(decodedToken, 'decodedToken');
+        userId = decodedToken.userId;
+      } catch (error) {
+        throw new NotFoundException('Invalid or expired token');
+      }
     }
 
-    const token = authorization.split(' ')[1];
-    const decoded = jwt.verify(
-      token,
-      this.configService.get<string>('JWT_SECRET'),
-    ) as { userId: string };
+    console.log(userId, 'userId userId');
 
-    return this.productsService.remove(id, decoded.userId);
+    return this.productsService.remove(id, userId);
   }
 }

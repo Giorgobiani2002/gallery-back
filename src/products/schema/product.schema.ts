@@ -19,14 +19,23 @@ export class Product extends Document {
   @Prop({ type: String, required: true })
   title: string;
 
+  @Prop({ type: String, required: true })
+  titleGEO: string;
+
   @Prop({ type: Number, required: true })
   year: number;
 
   @Prop({ type: String, required: true })
   description: string;
 
+  @Prop({ type: String, required: true })
+  descriptionGEO: string;
+
   @Prop({ type: String, enum: Category, required: true })
   category: Category;
+
+  @Prop({ type: String })
+  categoryGEO: Category;
 
   @Prop({ type: Number, required: true })
   height: number;
@@ -54,7 +63,6 @@ export class Product extends Document {
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'user' })
   user: mongoose.Schema.Types.ObjectId;
-  
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

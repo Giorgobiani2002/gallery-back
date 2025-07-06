@@ -4,19 +4,22 @@ import { Role } from 'src/enums/roles.enum';
 
 @Schema()
 export class User {
-  @Prop({ type: String })
+  @Prop({ type: String, required: true })
   fullName: string;
 
-  @Prop({ type: String })
+  @Prop({ type: String, required: true })
+  fullNameGEO: string;
+
+  @Prop({ type: String, required: true })
   email: string;
 
-  @Prop({ type: String, select: false })
+  @Prop({ type: String, select: false, required: true })
   password: string;
 
-  @Prop({ type: Number })
+  @Prop({ type: Number, required: true })
   phoneNumber: number;
 
-  @Prop({ type: String, select: false })
+  @Prop({ type: String, select: false, required: true })
   passwordRepeat: string;
 
   // @Prop({ type: String })
@@ -31,7 +34,7 @@ export class User {
   @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'cart', default: [] })
   carts: mongoose.Schema.Types.ObjectId[];
 
-  @Prop({ type: String, enum: Role,  })
+  @Prop({ type: String, enum: Role })
   role: string;
 
   @Prop({ type: String })
@@ -40,8 +43,12 @@ export class User {
   @Prop({ type: String })
   userBio: string;
 
+  @Prop({ type: String })
+  userBioGEO: string;
+
   @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'product', default: [] })
   Favorites: mongoose.Schema.Types.ObjectId[];
+
   @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'auction' }])
   wonAuctions: mongoose.Schema.Types.ObjectId[];
 

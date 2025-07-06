@@ -11,13 +11,25 @@ export class Gallery extends Document {
   name: string;
 
   @Prop({ type: String, required: true })
+  nameGEO: string;
+
+  @Prop({ type: String, required: true })
   addres: string;
+
+  @Prop({ type: String, required: true })
+  addresGEO: string;
 
   @Prop({ type: String, required: true })
   info: string;
 
   @Prop({ type: String, required: true })
+  infoGEO: string;
+
+  @Prop({ type: String, required: true })
   details: string;
+
+  @Prop({ type: String, required: true })
+  detailsGEO: string;
 
   @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'Product', default: [] })
   products: Product[];

@@ -8,7 +8,7 @@ import { PassportModule } from '@nestjs/passport';
 import { EmailSenderService } from 'src/email-sender/email-sender.service';
 import { EmailSenderModule } from 'src/email-sender/email-sender.module';
 import { AwsS3Module } from 'src/upload/aws-s3.module';
-import { GoogleStrategy } from './strategies/google.strategy';
+// import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
   imports: [
@@ -24,6 +24,6 @@ import { GoogleStrategy } from './strategies/google.strategy';
     AwsS3Module,
   ],
   controllers: [AuthController],
-  providers: [AuthService, GoogleStrategy],
+  providers: [AuthService],
 })
 export class AuthModule {}

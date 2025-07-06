@@ -14,9 +14,14 @@ export class CartService {
   ) {}
 
   async getCartByUserId(userId: mongoose.Types.ObjectId): Promise<Cart> {
-    let cart = await this.cartModel
-      .findOne({ user: userId })
-      .populate('items.product');
+    let cart = await this.cartModel.findOne({ user: userId }).populate({
+      path: 'items.product',
+      populate: {
+        path: 'user',
+        select:
+          '-products -createdAt -__v -password -role -cart -orders -carts',
+      },
+    });
 
     if (!cart) {
       cart = new this.cartModel({ user: userId, items: [], totalPrice: 0 });
@@ -36,15 +41,12 @@ export class CartService {
       throw new NotFoundException('Product not found');
     }
 
-    
     let cart = await this.cartModel.findOne({ user: userId });
 
-    
     if (!cart) {
       cart = new this.cartModel({ user: userId, items: [], totalPrice: 0 });
     }
 
-   
     const existingItemIndex = cart.items.findIndex(
       (item) => item.product.toString() === productId.toString(),
     );

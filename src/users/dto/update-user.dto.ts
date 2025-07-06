@@ -8,6 +8,10 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   fullName?: string;
 
   @IsOptional()
+  @IsString()
+  fullNameGEO?: string;
+
+  @IsOptional()
   @IsEmail()
   email?: string;
 
