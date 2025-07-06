@@ -14,6 +14,7 @@ import { Product } from 'src/products/schema/product.schema';
 import { User } from 'src/users/schema/user.schema';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { EmailSenderService } from 'src/email-sender/email-sender.service';
+import { PaypalService } from 'src/paypal/paypal.service';
 
 @Injectable()
 export class AuctionBiddingService {
@@ -23,6 +24,7 @@ export class AuctionBiddingService {
     @InjectModel('user') private userModel: Model<User>,
     private emailSenderService: EmailSenderService,
     private jwtService: JwtService,
+    private readonly paypalService: PaypalService,
   ) {}
 
   async create(createAuctionDto: CreateAuctionBiddingDto) {
@@ -173,13 +175,24 @@ export class AuctionBiddingService {
         const product = await this.productModel.findById(auction.product);
 
         if (user?.email && product?.title) {
-          const subject = `🎉 Congratulations, you won the auction for "${product.title}"!`;
+          const order = await this.paypalService.createOrder(
+            user._id.toString(),
+          );
+
+          const approvalLink = order.links?.find(
+            (link) => link.rel === 'approve',
+          )?.href;
+
+          const subject = `🎉 You won "${product.title}"! Complete your payment now`;
           const htmlContent = `
-          <div style="border: 2px solid #333; padding: 20px; font-family: Arial">
-            <h2>Hi ${user.fullName || 'Bidder'},</h2>
-            <p>You've won the auction for <strong>${product.title}</strong> with a bid of <strong>$${auction.latestBidAmount}</strong>.</p>
-            <p>We will contact you with delivery details soon.</p>
-            <p style="margin-top: 30px;">Thanks,<br/>Auction Gallery Team</p>
+          <div style="font-family: Arial; border: 1px solid #ccc; padding: 20px;">
+            <h2>Hello ${user.fullName || 'Bidder'},</h2>
+            <p>Congratulations! You've won the auction for <strong>${product.title}</strong>.</p>
+            <img src="${product.mainImgUrl}" alt="Auction Image" style="width: 100%; max-width: 600px; margin: 20px 0;" />
+            <p>Your winning bid: <strong>$${auction.latestBidAmount}</strong></p>
+            <p>Please complete your payment using the link below:</p>
+            <a href="${approvalLink}" style="display: inline-block; padding: 10px 20px; background-color: #0070ba; color: white; text-decoration: none;">Pay with PayPal</a>
+            <p>Thank you for participating!</p>
           </div>
         `;
 
@@ -188,11 +201,8 @@ export class AuctionBiddingService {
             subject,
             htmlContent,
           );
-
-          console.log(` Email sent to ${user.email}`);
         }
       } else {
-        console.log(` Auction ${auction._id} ended. No bids placed.`);
       }
     }
   }
