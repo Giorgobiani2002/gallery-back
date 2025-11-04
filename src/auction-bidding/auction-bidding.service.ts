@@ -15,6 +15,7 @@ import { User } from 'src/users/schema/user.schema';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { EmailSenderService } from 'src/email-sender/email-sender.service';
 import { PaypalService } from 'src/paypal/paypal.service';
+import { Cart } from 'src/cart/schema/cart.schema';
 
 @Injectable()
 export class AuctionBiddingService {
@@ -22,6 +23,7 @@ export class AuctionBiddingService {
     @InjectModel('auction') private auctionModel: Model<Auction>,
     @InjectModel('product') private productModel: Model<Product>,
     @InjectModel('user') private userModel: Model<User>,
+    @InjectModel('cart') private readonly cartModel: Model<Cart>,
     private emailSenderService: EmailSenderService,
     private jwtService: JwtService,
     private readonly paypalService: PaypalService,
@@ -157,6 +159,7 @@ export class AuctionBiddingService {
     }
     return auction;
   }
+
   @Cron(CronExpression.EVERY_10_SECONDS)
   async handleAuctionEndings() {
     const now = new Date();
@@ -173,6 +176,35 @@ export class AuctionBiddingService {
 
         const user = await this.userModel.findById(auction.latestBidder);
         const product = await this.productModel.findById(auction.product);
+
+        let cart = await this.cartModel.findOne({ user: user._id });
+        if (!cart) {
+          cart = new this.cartModel({
+            user: user._id,
+            items: [],
+            totalPrice: 0,
+          });
+        }
+
+        const existingItemIndex = cart.items.findIndex(
+          (item) => item.product.toString() === product._id.toString(),
+        );
+
+        if (existingItemIndex > -1) {
+          cart.items[existingItemIndex].price = auction.latestBidAmount;
+        } else {
+          cart.items.push({
+            product: product._id as mongoose.Types.ObjectId,
+            quantity: 1,
+            price: auction.latestBidAmount,
+          });
+        }
+
+        cart.totalPrice = cart.items.reduce(
+          (total, item) => total + item.price * item.quantity,
+          0,
+        );
+        await cart.save();
 
         if (user?.email && product?.title) {
           const order = await this.paypalService.createOrder(
@@ -202,7 +234,6 @@ export class AuctionBiddingService {
             htmlContent,
           );
         }
-      } else {
       }
     }
   }
