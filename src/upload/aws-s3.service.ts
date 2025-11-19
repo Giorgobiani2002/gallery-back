@@ -16,10 +16,26 @@ export class AwsS3Service {
 
   constructor() {
     this.bucketName = process.env.AWS_BUCKET_NAME;
+    console.log('AWS Configuration:');
+    console.log('Bucket Name:', this.bucketName);
+    console.log('Region:', process.env.AWS_REGION);
+    console.log(
+      'Access Key:',
+      process.env.AWS_ACCESS_KEY ? 'EXISTS' : 'MISSING',
+    );
+    console.log(
+      'Secret Key:',
+      process.env.AWS_SECRET_ACCESS_KEY ? 'EXISTS' : 'MISSING',
+    );
+    console.log('Access Key length:', process.env.AWS_ACCESS_KEY?.length);
+    console.log(
+      'Secret Key length:',
+      process.env.AWS_SECRET_ACCESS_KEY?.length,
+    );
     this.storageService = new S3Client({
       credentials: {
-        accessKeyId: process.env.AWS_ACCES_KEY,
-        secretAccessKey: process.env.AWS_SECRET_ACCES_KEY,
+        accessKeyId: process.env.AWS_ACCESS_KEY,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
       },
       region: process.env.AWS_REGION,
     });
